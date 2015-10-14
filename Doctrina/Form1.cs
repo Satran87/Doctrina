@@ -298,6 +298,7 @@ namespace Doctrina
             //TODO:Проверку на то, что не зациклюсь (повторов не перебор)
             cancelButton.Enabled = true;
             dateThenAllowPrint = dateThenAllowPrintPicker.Value;
+
             try
             {
                 MaxQuestionOnListUint = Convert.ToUInt32(MaxQuestionOnListText.Text);
