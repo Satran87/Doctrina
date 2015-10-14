@@ -332,11 +332,11 @@ namespace Doctrina
                 OnErrorHappen("Количество доступных повторов документа слишком мало");
                 return;
             }
-            if (IsQuestionEnAllList())
-            {
-                OnErrorHappen("Количество доступных вопросов на все документы меньше, чем запрошенно");
-                return;
-            }
+            //if (IsQuestionEnAllList())
+           // {
+           //     OnErrorHappen("Количество доступных вопросов на все документы меньше, чем запрошенно");
+           //     return;
+          //  }
             timer1.Start();
             progressBar1.Style = ProgressBarStyle.Marquee;
             backgroundWorker1.RunWorkerAsync();     
@@ -353,7 +353,7 @@ namespace Doctrina
                         rowIndex.Add(currentIndex);
                 ++currentIndex;
             }
-            if (datagridForDataTable.Rows.Count - rowIndex.Count <= MaxLists* MaxQuestonRepeatUint)//Кол-во доступых-всего надо
+            if (datagridForDataTable.Rows.Count - rowIndex.Count >= MaxLists* MaxQuestonRepeatUint)//BUG:Кол-во доступых(сейчас на одну страницу, а надо на все)-всего надо
                 return false;
             return true;
         }
