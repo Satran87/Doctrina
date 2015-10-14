@@ -40,6 +40,7 @@ namespace Doctrina
         public void SaveDataFromClipboard(bool isAnswer,string fileName)
         {
             Document doc;
+            bool isDocExist = false;
             if (!Directory.Exists("TempFolder"))
             {
                 Directory.CreateDirectory("TempFolder");
@@ -58,6 +59,8 @@ namespace Doctrina
             if (File.Exists(fullName))
             {
                 doc = myWord.Documents.Open(fullName); //TODO: Добавить пустую страницу
+                isDocExist = true;
+                
 
             }
             else
@@ -70,6 +73,8 @@ namespace Doctrina
             unit = WdUnits.wdStory;
             extend = WdMovementType.wdMove;
             myWord.Selection.EndKey(ref unit, ref extend);
+            if(isDocExist)
+                myWord.Selection.InsertNewPage();
             myWord.Selection.Paste();
             doc.SaveAs(FileName: fullName);
             doc.Close();
