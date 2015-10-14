@@ -58,6 +58,7 @@ namespace Doctrina
             if (File.Exists(fullName))
             {
                 doc = myWord.Documents.Open(fullName); //TODO: Добавить пустую страницу
+
             }
             else
             {
