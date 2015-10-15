@@ -11,7 +11,7 @@ public static class ErrorLog
 
     public static void AddNewEntry(string text)
     {
-        if (!File.Exists("errorLog.log"))
+        if (!File.Exists("errorLog.log"))//Rename?
         {
             File.Create("errorLog.log").Close();
         }
