@@ -385,7 +385,7 @@ namespace Doctrina
         private void GetBlocks(ref List<List<DoneBlock>> allQuestions)
         {
             uint someTimer = 0;
-            uint bannedSymbolMeets = 0;
+            bool bannedSymbolMeets = false;
             for (int listNumber = 0; listNumber < MaxLists;)
             {
                 List<DoneBlock> uniqueQuestion = new List<DoneBlock>();
@@ -398,13 +398,10 @@ namespace Doctrina
                         {
                             if (doneBlocks[randBlock].AnswerPath.Contains('!'))
                             {
-                                ++bannedSymbolMeets;
-                                if (bannedSymbolMeets >= 10)//Если уже встречался 10 раз, так и быть, пустим.
-                                {
-                                    bannedSymbolMeets = 0;
-                                    uniqueQuestion.Add(doneBlocks[randBlock]);
-                                    ++questions;
-                                }
+                                if (bannedSymbolMeets) continue;
+                                bannedSymbolMeets = true;
+                                uniqueQuestion.Add(doneBlocks[randBlock]);
+                                ++questions;
                             }
                             else
                             {
