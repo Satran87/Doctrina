@@ -20,7 +20,6 @@ namespace Doctrina
 {
     public partial class Form1 : Form
     {
-
         private const string colunmNameFileName = "Имя файла";
         private const string colunmNameRepeat = "Повторы";
         private const string colunmNamelPrintTime = "Время последней печати";
@@ -93,6 +92,10 @@ namespace Doctrina
         /// Готовый комплект вопросов
         /// </summary>
         internal List<DoneBlock> doneBlocks = new List<DoneBlock>();
+        /// <summary>
+        /// Копия блоков до запуска. В случае ошибки через них идет отмена.
+        /// </summary>
+        internal List<DoneBlock> doneBlocks_oldCopy = new List<DoneBlock>();
 
         public Form1()
         {
@@ -178,11 +181,17 @@ namespace Doctrina
                     SetBoolInThread(true);
                 }
                 SetTextinThread("");
+                doneBlocks_oldCopy.Clear();
+                doneBlocks_oldCopy=CheckClass.CopyDoneBlocks(doneBlocks);
             }
             catch (Exception e)
             {
                 ErrorLog.AddNewEntry(e.Message);
-                if (OnErrorHappenYesNo("Произошла ошибка " + e.Message + " Закрыть программу?"))
+                doneBlocks.Clear();
+                doneBlocks = CheckClass.CopyDoneBlocks(doneBlocks_oldCopy);
+                wordHlp.CloseWord();
+                wordHlp.DeleteAllFilesOnTempDirectory();
+                if (OnErrorHappenYesNo("Произошла ошибка \r\n" + e.Message + "\r\nЗакрыть программу?"))
                 {
                     Environment.Exit(0);
                 }
@@ -201,7 +210,8 @@ namespace Doctrina
             catch (Exception e)
             {
                 ErrorLog.AddNewEntry(e.Message);
-                if (OnErrorHappenYesNo("Произошла ошибка " + e.Message + " Закрыть программу?"))
+                wordHlp.CloseWord();
+                if (OnErrorHappenYesNo("Произошла ошибка \r\n" + e.Message + "\r\nЗакрыть программу?"))
                 {
                     Environment.Exit(0);
                 }
@@ -305,10 +315,10 @@ namespace Doctrina
 
         private void RunButton_Click(object sender, EventArgs e)
         {
-            //TODO:Проверку на то, что не зациклюсь (повторов не перебор)
             cancelButton.Enabled = true;
             DateThenAllowPrint = dateThenAllowPrintPicker.Value;
-
+            doneBlocks_oldCopy.Clear();
+            doneBlocks_oldCopy = CheckClass.CopyDoneBlocks(doneBlocks);
             try
             {
                 MaxQuestionOnListUint = Convert.ToUInt32(MaxQuestionOnListText.Text);
@@ -376,7 +386,7 @@ namespace Doctrina
                     }
                     if (someTimer >= 60000)
                     {
-                        if(OnErrorHappenYesNo("Ошибка комбинации возможных вариантов.Создаем дамп?"))
+                        if(OnErrorHappenYesNo("Ошибка комбинации возможных вариантов. \r\nСоздаем дамп?"))
                             ErrorLog.CreateDump();
                         ErrorLog.AddNewEntry("Вопросов_на_лист="+MaxQuestionOnListUint+" | Макс_повторов_вопросов= "+ MaxQuestonRepeatUint+ " | Всего_листов= " + MaxLists);
                         File.Copy(_chooseFolderPath + @"\" + fileNameListText,"ErrorList"+DateTime.Now.Day+DateTime.Now.Hour+DateTime.Now.Minute+".csv");
@@ -574,7 +584,7 @@ namespace Doctrina
             }
         }
 
-        internal void OnErrorHappen(string text)
+        public void OnErrorHappen(string text)
         {
             MessageBox.Show(text, "Произошла ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             ErrorLog.AddNewEntry(text);

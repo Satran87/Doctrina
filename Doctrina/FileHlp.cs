@@ -21,17 +21,24 @@ namespace Doctrina
         {
             myWord.Visible = false;
         }
-        public void CreateDoc()
-        {
-            
-            Document doc = myWord.Documents.Add();
-        }
 
         public IDataObject ReadTextFromDoc(string pathToDoc)
         {
-            Document doc = myWord.Documents.Open(FileName: pathToDoc, Visible: false);
-           doc.ActiveWindow.Selection.WholeStory();
-            doc.ActiveWindow.Selection.Copy();
+            Document doc = null;
+            try
+            {
+                doc = myWord.Documents.Open(FileName: pathToDoc, Visible: false);
+                doc.ActiveWindow.Selection.WholeStory();
+                doc.ActiveWindow.Selection.Copy();
+            }
+            catch (Exception e)
+            {
+                doc.Close();
+                ErrorLog.AddNewEntry(e.Message);
+                DeleteAllFilesOnTempDirectory();
+                throw new Exception("Ошибка при чтении документа");
+            }
+            
             doc.Close();
             var data = Clipboard.GetDataObject();
             return data;
@@ -39,8 +46,12 @@ namespace Doctrina
 
         public void SaveDataFromClipboard(bool isAnswer,string fileName)
         {
-            Document doc;
+            Document doc = null;
             bool isDocExist = false;
+            object unit;
+            object extend;
+            unit = WdUnits.wdStory;
+            extend = WdMovementType.wdMove;
             if (!Directory.Exists("TempFolder"))
             {
                 Directory.CreateDirectory("TempFolder");
@@ -56,27 +67,32 @@ namespace Doctrina
                 fileName = fileName + "_Ques";
             }
             string fullName = fileName + ".docx";
-            if (File.Exists(fullName))
+            try
             {
-                doc = myWord.Documents.Open(fullName); //TODO: Добавить пустую страницу
-                isDocExist = true;
-                
+                if (File.Exists(fullName))
+                {
+                    doc = myWord.Documents.Open(fullName);
+                    isDocExist = true;
+                }
+                else
+                {
+                    doc = myWord.Documents.Add();
+                }
 
+                myWord.Selection.EndKey(ref unit, ref extend);
+                if (isDocExist)
+                    myWord.Selection.InsertNewPage();
+                myWord.Selection.Paste();
+                doc.SaveAs(FileName: fullName);
             }
-            else
+            catch (Exception e)
             {
-               doc = myWord.Documents.Add();
- 
+                doc.Close();
+                ErrorLog.AddNewEntry(e.Message);
+                DeleteAllFilesOnTempDirectory();
+                throw new Exception("Ошибка при сохранении документа из буфера");
             }
-            object unit;
-            object extend;
-            unit = WdUnits.wdStory;
-            extend = WdMovementType.wdMove;
-            myWord.Selection.EndKey(ref unit, ref extend);
-            if(isDocExist)
-                myWord.Selection.InsertNewPage();
-            myWord.Selection.Paste();
-            doc.SaveAs(FileName: fullName);
+            
             doc.Close();
 
         }
@@ -105,8 +121,19 @@ namespace Doctrina
 
         public void Print(object fileName)
         {
-            Document doc = myWord.Documents.Open(FileName: fileName, Visible: false);
-            doc.ActiveWindow.PrintOut();
+            Document doc = null;
+            try
+            {
+                doc = myWord.Documents.Open(FileName: fileName, Visible: false);
+                doc.ActiveWindow.PrintOut();
+            }
+            catch (Exception e)
+            {
+                if (doc != null) doc.Close();
+                ErrorLog.AddNewEntry(e.Message);
+                DeleteAllFilesOnTempDirectory();
+                throw new Exception("Ошибка при открытии документа");
+            }
             doc.Close();
             LocalPrintServer ps = new LocalPrintServer();
             while (ps.DefaultPrintQueue.NumberOfJobs > 0)//TODO:Получить очередь печати принтера и найти норм вирт принтер
@@ -141,13 +168,13 @@ namespace Doctrina
         {
             if (!Directory.Exists(GetTempDirectory()))
                 return;
-            DirectoryInfo directoryInfo = new DirectoryInfo(GetTempDirectory()); //загружаем в экземпляр класса DirectroyInfo информацию о всех файлах
+            DirectoryInfo directoryInfo = new DirectoryInfo(GetTempDirectory());
 
-            foreach (FileInfo file in directoryInfo.GetFiles()) //получаем список всех файлов в выбранном каталоге
+            foreach (FileInfo file in directoryInfo.GetFiles()) 
             {
                 try
                 {
-                        file.Delete(); //пытаемся удалить файл
+                        file.Delete();
                 }
                 catch (Exception e)
                 {

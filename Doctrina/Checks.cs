@@ -1,10 +1,8 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Windows.Forms;
-using Microsoft.Office.Interop.Word;
 
 namespace Doctrina
 {
@@ -13,47 +11,47 @@ namespace Doctrina
         public static bool Cheks(Form1 form1)
         {
 
-            if (form1.MaxLists > form1.MaxQuestionOnListUint*form1.MaxQuestonRepeatUint*form1.doneBlocks.Count)
+            if (form1.MaxLists > form1.MaxQuestionOnListUint * form1.MaxQuestonRepeatUint * form1.doneBlocks.Count)
             {
-                form1.OnErrorHappen("Листов больше чем возможных комбинаций");
+                form1.OnErrorHappen("Р›РёСЃС‚РѕРІ Р±РѕР»СЊС€Рµ С‡РµРј РІРѕР·РјРѕР¶РЅС‹С… РєРѕРјР±РёРЅР°С†РёР№");
                 return true;
             }
             if (form1.MaxQuestonRepeatUint > form1.doneBlocks.Count)
             {
-                form1.OnErrorHappen("Количество запросов на страницу слишком большое");
+                form1.OnErrorHappen("РљРѕР»РёС‡РµСЃС‚РІРѕ Р·Р°РїСЂРѕСЃРѕРІ РЅР° СЃС‚СЂР°РЅРёС†Сѓ СЃР»РёС€РєРѕРј Р±РѕР»СЊС€РѕРµ");
                 return true;
             }
             if (form1.MaxQuestionOnListUint > form1.doneBlocks.Count)
             {
-                form1.OnErrorHappen("Количество вопросов на документ больше, чем самих вопросов");
+                form1.OnErrorHappen("РљРѕР»РёС‡РµСЃС‚РІРѕ РІРѕРїСЂРѕСЃРѕРІ РЅР° РґРѕРєСѓРјРµРЅС‚ Р±РѕР»СЊС€Рµ, С‡РµРј СЃР°РјРёС… РІРѕРїСЂРѕСЃРѕРІ");
                 return true;
             }
             if (RepeatCheck(form1))
             {
-                form1.OnErrorHappen("Количество доступных повторов документа слишком мало");
+                form1.OnErrorHappen("РљРѕР»РёС‡РµСЃС‚РІРѕ РґРѕСЃС‚СѓРїРЅС‹С… РїРѕРІС‚РѕСЂРѕРІ РґРѕРєСѓРјРµРЅС‚Р° СЃР»РёС€РєРѕРј РјР°Р»Рѕ");
                 return true;
             }
             //if (IsQuestionEnAllList())
             // {
-            //     OnErrorHappen("Количество доступных вопросов на все документы меньше, чем запрошенно");
+            //     OnErrorHappen("РљРѕР»РёС‡РµСЃС‚РІРѕ РґРѕСЃС‚СѓРїРЅС‹С… РІРѕРїСЂРѕСЃРѕРІ РЅР° РІСЃРµ РґРѕРєСѓРјРµРЅС‚С‹ РјРµРЅСЊС€Рµ, С‡РµРј Р·Р°РїСЂРѕС€РµРЅРЅРѕ");
             //     return;
             //  }
-           return CheckAlllOther(form1);
+            return CheckAlllOther(form1);
         }
 
-        private static bool IsQuestionEnAllList(Form1 form1) //Есть ли вопросы для печати доступные на все страницы
+        private static bool IsQuestionEnAllList(Form1 form1) //Р•СЃС‚СЊ Р»Рё РІРѕРїСЂРѕСЃС‹ РґР»СЏ РїРµС‡Р°С‚Рё РґРѕСЃС‚СѓРїРЅС‹Рµ РЅР° РІСЃРµ СЃС‚СЂР°РЅРёС†С‹
         {
             List<int> rowIndex = new List<int>();
             int currentIndex = 0;
             foreach (DataRow row in form1.myDT.Rows)
             {
-                if ((uint) row[1] >= form1.MaxQuestonRepeatUint)
-                    if ((DateTime) row[2] <= form1.DateThenAllowPrint)
+                if ((uint)row[1] >= form1.MaxQuestonRepeatUint)
+                    if ((DateTime)row[2] <= form1.DateThenAllowPrint)
                         rowIndex.Add(currentIndex);
                 ++currentIndex;
             }
-            if (form1.myDT.Rows.Count - rowIndex.Count >= form1.MaxLists*form1.MaxQuestonRepeatUint)
-                //BUG:Кол-во доступых(сейчас на одну страницу, а надо на все)-всего надо
+            if (form1.myDT.Rows.Count - rowIndex.Count >= form1.MaxLists * form1.MaxQuestonRepeatUint)
+                //BUG:РљРѕР»-РІРѕ РґРѕСЃС‚СѓРїС‹С…(СЃРµР№С‡Р°СЃ РЅР° РѕРґРЅСѓ СЃС‚СЂР°РЅРёС†Сѓ, Р° РЅР°РґРѕ РЅР° РІСЃРµ)-РІСЃРµРіРѕ РЅР°РґРѕ
                 return false;
             return true;
         }
@@ -62,7 +60,7 @@ namespace Doctrina
         {
             uint totalRepeat = form1.doneBlocks.Aggregate<DoneBlock, uint>(0,
                 (current, block) => current + block.TimeRepeated);
-            var needRepeat = form1.MaxLists*form1.MaxQuestonRepeatUint*form1.MaxQuestionOnListUint;
+            var needRepeat = form1.MaxLists * form1.MaxQuestonRepeatUint * form1.MaxQuestionOnListUint;
             if (totalRepeat <= needRepeat)
                 return false;
             return true;
@@ -99,11 +97,11 @@ namespace Doctrina
                     }
                     if (someTimer >= 60000)
                     {
-                        form1.OnErrorHappen("Ошибка комбинации возможных вариантов");
-                        ErrorLog.AddNewEntry("Вопросов_на_лист=" + form1.MaxQuestionOnListUint + " | Макс_повторов_вопросов= " +
-                                             form1.MaxQuestonRepeatUint + " | Всего_листов= " + form1.MaxLists);
+                        form1.OnErrorHappen("РћС€РёР±РєР° РєРѕРјР±РёРЅР°С†РёРё РІРѕР·РјРѕР¶РЅС‹С… РІР°СЂРёР°РЅС‚РѕРІ \n\rРџСЂРѕРІРµСЂСЊС‚Рµ РІРІРѕРґРёРјС‹Рµ РґР°РЅРЅС‹Рµ Рё РєРѕР»РёС‡РµСЃС‚РІРѕ РґРѕСЃС‚СѓРїРЅС‹С… РІРѕРїСЂРѕСЃРѕРІ");
+                        ErrorLog.AddNewEntry("Р’РѕРїСЂРѕСЃРѕРІ_РЅР°_Р»РёСЃС‚=" + form1.MaxQuestionOnListUint + " | РњР°РєСЃ_РїРѕРІС‚РѕСЂРѕРІ_РІРѕРїСЂРѕСЃРѕРІ= " +
+                                             form1.MaxQuestonRepeatUint + " | Р’СЃРµРіРѕ_Р»РёСЃС‚РѕРІ= " + form1.MaxLists);
                         File.Copy(form1._chooseFolderPath + @"\" + Form1.fileNameListText,
-                            "ErrorList" + DateTime.Now.Day + DateTime.Now.Hour + DateTime.Now.Minute + ".csv");
+                            "ErrorList" + DateTime.Now.Day + "_" + DateTime.Now.Hour + "_" + DateTime.Now.Minute + "_" + DateTime.Now.Second + ".csv");
                         return true;
                     }
                     ++someTimer;
@@ -113,9 +111,9 @@ namespace Doctrina
             return false;
         }
 
-        private static List<DoneBlock> CopyDoneBlocks(List<DoneBlock> doneBlocks)
+        public static List<DoneBlock> CopyDoneBlocks(List<DoneBlock> doneBlocks)
         {
-             List <DoneBlock> copyedList = doneBlocks.Select(doneBlock => new DoneBlock(doneBlock.QuestionPath, doneBlock.AnswerPath, doneBlock.LastTimePrint, doneBlock.TimeRepeated)).ToList();
+            List<DoneBlock> copyedList = doneBlocks.Select(doneBlock => new DoneBlock(doneBlock.QuestionPath, doneBlock.AnswerPath, doneBlock.LastTimePrint, doneBlock.TimeRepeated)).ToList();
             return copyedList;
         }
     }
