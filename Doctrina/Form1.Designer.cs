@@ -341,8 +341,8 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ProgressBar progressBar1;
-        private System.Windows.Forms.DateTimePicker dateThenAllowPrintPicker;
-        private System.Windows.Forms.DataGridView datagridForDataTable;
+        internal System.Windows.Forms.DateTimePicker dateThenAllowPrintPicker;
+        internal System.Windows.Forms.DataGridView datagridForDataTable;
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.TextBox currentFolderTextBox;

@@ -24,7 +24,7 @@ namespace Doctrina
         private const string colunmNameFileName = "Имя файла";
         private const string colunmNameRepeat = "Повторы";
         private const string colunmNamelPrintTime = "Время последней печати";
-        private const string fileNameListText = "FileList.csv";
+        internal const string fileNameListText = "FileList.csv";
         private const string ConfigIniFileName = "config.ini";
         private const string DateThenAllowPrintPickerString = "Data=";
         private const string NumberOfListsString = "NumberOfLists=";
@@ -35,6 +35,9 @@ namespace Doctrina
 
         private FileHlp wordHlp = new FileHlp();
 
+        /// <summary>
+        /// Количество вопросов на лист
+        /// </summary>
         public uint MaxQuestionOnListUint
         {
             get { return _maxQuestionOnListUint; }
@@ -48,7 +51,9 @@ namespace Doctrina
                 _maxQuestionOnListUint = value;
             }
         }
-
+        /// <summary>
+        /// Количество повторов вопроса
+        /// </summary>
         public uint MaxQuestonRepeatUint
         {
             get { return _maxQuestonRepeatUint; }
@@ -62,7 +67,9 @@ namespace Doctrina
                 _maxQuestonRepeatUint = value;
             }
         }
-
+        /// <summary>
+        /// Всего листов
+        /// </summary>
         public uint MaxLists
         {
             get { return _maxLists; }
@@ -79,10 +86,13 @@ namespace Doctrina
         private uint _maxQuestionOnListUint = 5;
         private uint _maxQuestonRepeatUint = 5;
         private uint _maxLists = 5;
-        private DateTime dateThenAllowPrint;
-        private DataTable myDT;
-        private string _chooseFolderPath = null;
-        private List<DoneBlock> doneBlocks = new List<DoneBlock>();
+        internal DateTime DateThenAllowPrint;
+        internal DataTable myDT;
+        internal string _chooseFolderPath = null;
+        /// <summary>
+        /// Готовый комплект вопросов
+        /// </summary>
+        internal List<DoneBlock> doneBlocks = new List<DoneBlock>();
 
         public Form1()
         {
@@ -297,7 +307,7 @@ namespace Doctrina
         {
             //TODO:Проверку на то, что не зациклюсь (повторов не перебор)
             cancelButton.Enabled = true;
-            dateThenAllowPrint = dateThenAllowPrintPicker.Value;
+            DateThenAllowPrint = dateThenAllowPrintPicker.Value;
 
             try
             {
@@ -312,60 +322,14 @@ namespace Doctrina
             }
 
 
-            if (MaxLists > MaxQuestionOnListUint*MaxQuestonRepeatUint*doneBlocks.Count)
-            {
-                OnErrorHappen("Листов больше чем возможных комбинаций");
-                return;
-            }
-            if (MaxQuestonRepeatUint > doneBlocks.Count)
-            {
-                OnErrorHappen("Количество запросов на страницу слишком большое");
-                return;
-            }
-            if (MaxQuestionOnListUint > doneBlocks.Count)
-            {
-                OnErrorHappen("Количество вопросов на документ больше, чем самих вопросов");
-                return;
-            }
-            if (RepeatCheck())
-            {
-                OnErrorHappen("Количество доступных повторов документа слишком мало");
-                return;
-            }
-            //if (IsQuestionEnAllList())
-           // {
-           //     OnErrorHappen("Количество доступных вопросов на все документы меньше, чем запрошенно");
-           //     return;
-          //  }
+            if (CheckClass.Cheks(this)) return;
             timer1.Start();
             progressBar1.Style = ProgressBarStyle.Marquee;
             backgroundWorker1.RunWorkerAsync();     
         }
 
-        private bool IsQuestionEnAllList()//Есть ли вопросы для печати доступные на все страницы
-        {
-            List<int> rowIndex = new List<int>();
-            int currentIndex = 0;
-            foreach (DataGridViewRow row in datagridForDataTable.Rows)
-            {
-                if ((uint)row.Cells[1].Value >= MaxQuestonRepeatUint)
-                    if ((DateTime)row.Cells[2].Value <= dateThenAllowPrintPicker.Value)
-                        rowIndex.Add(currentIndex);
-                ++currentIndex;
-            }
-            if (datagridForDataTable.Rows.Count - rowIndex.Count >= MaxLists* MaxQuestonRepeatUint)//BUG:Кол-во доступых(сейчас на одну страницу, а надо на все)-всего надо
-                return false;
-            return true;
-        }
 
-        private bool RepeatCheck()
-        {
-            uint totalRepeat = doneBlocks.Aggregate<DoneBlock, uint>(0, (current, block) => current + block.TimeRepeated);
-            var needRepeat = MaxLists*MaxQuestonRepeatUint*MaxQuestionOnListUint;
-            if (totalRepeat <= needRepeat)
-                return false;
-            return true;
-        }
+
         private void CreateDocxFiles(List<List<DoneBlock>> allQuestions)
         {
             try
@@ -394,7 +358,7 @@ namespace Doctrina
                     var randBlock = RandomNumber.Between(0, doneBlocks.Count-1);
                     if (!uniqueQuestion.Contains(doneBlocks[randBlock]))
                     {
-                        if (doneBlocks[randBlock].AllowPrint(MaxQuestonRepeatUint, dateThenAllowPrint))
+                        if (doneBlocks[randBlock].AllowPrint(MaxQuestonRepeatUint, DateThenAllowPrint))
                         {
                             if (doneBlocks[randBlock].AnswerPath.Contains('!'))
                             {
@@ -416,7 +380,7 @@ namespace Doctrina
                             ErrorLog.CreateDump();
                         ErrorLog.AddNewEntry("Вопросов_на_лист="+MaxQuestionOnListUint+" | Макс_повторов_вопросов= "+ MaxQuestonRepeatUint+ " | Всего_листов= " + MaxLists);
                         File.Copy(_chooseFolderPath + @"\" + fileNameListText,"ErrorList"+DateTime.Now.Day+DateTime.Now.Hour+DateTime.Now.Minute+".csv");
-                        goto exit;
+                        break;
 
                     }
                     ++someTimer;
@@ -424,7 +388,6 @@ namespace Doctrina
                 allQuestions.Add(uniqueQuestion);
                 ++listNumber;
             }
-            exit:;
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -611,7 +574,7 @@ namespace Doctrina
             }
         }
 
-        private void OnErrorHappen(string text)
+        internal void OnErrorHappen(string text)
         {
             MessageBox.Show(text, "Произошла ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             ErrorLog.AddNewEntry(text);
@@ -634,7 +597,7 @@ namespace Doctrina
                 {
                     if (lines[t].Contains(DateThenAllowPrintPickerString))
                     {
-                        lines[t] = DateThenAllowPrintPickerString + dateThenAllowPrintPicker.Value;
+                        lines[t] = DateThenAllowPrintPickerString + DateThenAllowPrint;
                         continue;
                     }
                     if (lines[t].Contains(NumberOfListsString))
@@ -715,7 +678,7 @@ namespace Doctrina
             foreach (DataGridViewRow row in datagridForDataTable.Rows)
             {
                if((uint)row.Cells[1].Value>= MaxQuestonRepeatUint)
-                    if((DateTime)row.Cells[2].Value <= dateThenAllowPrintPicker.Value)
+                    if((DateTime)row.Cells[2].Value <= DateThenAllowPrint)
                     rowIndex.Add(currentIndex);
                 ++currentIndex;
             }
@@ -748,7 +711,7 @@ namespace Doctrina
 
         private void dateThenAllowPrintPicker_ValueChanged(object sender, EventArgs e)
         {
-
+            DateThenAllowPrint = dateThenAllowPrintPicker.Value;
             colorTable();
         }
 
