@@ -136,8 +136,8 @@ namespace Doctrina
                         form1.OnErrorHappen("Ошибка комбинации возможных вариантов \n\rПроверьте вводимые данные и количество доступных вопросов");
                         ErrorLog.AddNewEntry("Вопросов_на_лист=" + form1.MaxQuestionOnListUint + " | Макс_повторов_вопросов= " +
                                              form1.MaxQuestonRepeatUint + " | Всего_листов= " + form1.MaxLists);
-                        if(File.Exists(form1._chooseFolderPath + @"\" + Form1.fileNameListText))
-                        File.Copy(form1._chooseFolderPath + @"\" + Form1.fileNameListText,
+                        if(File.Exists(form1.ChooseFolderPath + @"\" + Form1.FileNameListText))
+                        File.Copy(form1.ChooseFolderPath + @"\" + Form1.FileNameListText,
                             "ErrorList" + DateTime.Now.Day + "_" + DateTime.Now.Hour + "_" + DateTime.Now.Minute + "_" + DateTime.Now.Second + ".csv");
                         return true;
                     }

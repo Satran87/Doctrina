@@ -20,10 +20,10 @@ namespace Doctrina
 {
     public partial class Form1 : Form
     {
-        private const string colunmNameFileName = "Имя файла";
-        private const string colunmNameRepeat = "Повторы";
-        private const string colunmNamelPrintTime = "Время последней печати";
-        internal const string fileNameListText = "FileList.csv";
+        private const string ColunmNameFileName = "Имя файла";
+        private const string ColunmNameRepeat = "Повторы";
+        private const string ColunmNamelPrintTime = "Время последней печати";
+        internal const string FileNameListText = "FileList.csv";
         private const string ConfigIniFileName = "config.ini";
         private const string DateThenAllowPrintPickerString = "Data=";
         private const string NumberOfListsString = "NumberOfLists=";
@@ -33,7 +33,7 @@ namespace Doctrina
 
         private List<List<DoneBlock>> allQuestionsGlobal = new List<List<DoneBlock>>();
 
-        private FileHlp wordHlp = new FileHlp();
+        private FileHlp _wordHlp = new FileHlp();
 
         /// <summary>
         /// Количество вопросов на лист
@@ -88,7 +88,7 @@ namespace Doctrina
         private uint _maxLists = 5;
         internal DateTime DateThenAllowPrint;
         internal DataTable myDT;
-        internal string _chooseFolderPath = null;
+        internal string ChooseFolderPath = null;
         /// <summary>
         /// Готовый комплект вопросов
         /// </summary>
@@ -102,7 +102,7 @@ namespace Doctrina
         {
             CheckPassword();
             InitializeComponent();
-            wordHlp.MyEvent += MyEventHendler;
+            _wordHlp.MyEvent += MyEventHendler;
             backgroundWorker1.DoWork+=BackgroundWorker1OnDoWork;
             backgroundWorker2.DoWork += BackgroundWorker2_DoWork;
             cancelButton.Enabled = false;
@@ -169,16 +169,16 @@ namespace Doctrina
                 SetTextinThread("Печатаем");
                 if (allCheckBox.Checked)
                 {
-                    PrintAll(wordHlp.GetTempDirectory());
+                    PrintAll(_wordHlp.GetTempDirectory());
                 }
                 else if (answerCheckBox.Checked)
                 {
-                    PrintAnswer(wordHlp.GetTempDirectory());
+                    PrintAnswer(_wordHlp.GetTempDirectory());
                     SetBoolInThread(true);
                 }
                 else if (questionCheckBox.Checked)
                 {
-                    PrintQuestion(wordHlp.GetTempDirectory());
+                    PrintQuestion(_wordHlp.GetTempDirectory());
                     SetBoolInThread(true);
                 }
                 SetTextinThread("");
@@ -190,8 +190,8 @@ namespace Doctrina
                 ErrorLog.AddNewEntry(e.Message);
                 doneBlocks.Clear();
                 doneBlocks = CheckClass.CopyDoneBlocks(doneBlocks_oldCopy);
-                wordHlp.CloseWord();
-                wordHlp.DeleteAllFilesOnTempDirectory();
+                _wordHlp.CloseWord();
+                _wordHlp.DeleteAllFilesOnTempDirectory();
                 if (OnErrorHappenYesNo("Произошла ошибка \r\n" + e.Message + "\r\nЗакрыть программу?"))
                 {
                     Environment.Exit(0);
@@ -205,13 +205,13 @@ namespace Doctrina
             try
             {
                 SetTextinThread("Печатаем");
-                PrintAll(wordHlp.GetTempDirectory());
+                PrintAll(_wordHlp.GetTempDirectory());
                 SetTextinThread("");
             }
             catch (Exception e)
             {
                 ErrorLog.AddNewEntry(e.Message);
-                wordHlp.CloseWord();
+                _wordHlp.CloseWord();
                 if (OnErrorHappenYesNo("Произошла ошибка \r\n" + e.Message + "\r\nЗакрыть программу?"))
                 {
                     Environment.Exit(0);
@@ -224,24 +224,29 @@ namespace Doctrina
         {
 
             var dlgResult = folderDialog.ShowDialog();
-            if (!string.IsNullOrEmpty(_chooseFolderPath))
+            if (!string.IsNullOrEmpty(ChooseFolderPath))
             {
-                SaveDtToFile(_chooseFolderPath);
+                SaveDtToFile(ChooseFolderPath);
                 SaveInit();
             }
             if (dlgResult == DialogResult.OK)
             {
-                _chooseFolderPath = folderDialog.SelectedPath;
-                currentFolderTextBox.Text = _chooseFolderPath;
+                ChooseFolderPath = folderDialog.SelectedPath;
+                currentFolderTextBox.Text = ChooseFolderPath;
                 RunButton.Enabled = true;
-                wordHlp.DeleteAllFilesOnTempDirectory();
+                _wordHlp.DeleteAllFilesOnTempDirectory();
                 PrintLastButton.Visible = false;
-                doneBlocks.Clear();
-                allQuestionsGlobal.Clear();
-                GetAllFileFromFolder(_chooseFolderPath);
-                FillList();
+                ReloadData();
             }
             
+        }
+
+        private void ReloadData()
+        {
+            doneBlocks.Clear();
+            allQuestionsGlobal.Clear();
+            GetAllFileFromFolder(ChooseFolderPath);
+            FillList();
         }
 
         private void GetAllFileFromFolder(string folderPath)
@@ -257,11 +262,12 @@ namespace Doctrina
 
             if(hasNewFiles)
             {
-                var allAnswerFiles = Directory.GetFiles(folderPath, "*Р*.docx", SearchOption.TopDirectoryOnly);
-                var allQuestionFiles = Directory.GetFiles(folderPath, "*У*.docx*", SearchOption.TopDirectoryOnly);
+                var allAnswerFiles = Directory.GetFiles(folderPath, "*Р?.docx", SearchOption.TopDirectoryOnly);
+                var allQuestionFiles = Directory.GetFiles(folderPath, "*У?.docx*", SearchOption.TopDirectoryOnly);
                 if (allQuestionFiles.Count() != allAnswerFiles.Count())
                 {
                     OnErrorHappen("Количество вопросов и ответов не совпадает");
+                    RunButton.Enabled = false;
                     return; //Потом кидать exception
                 }
                     
@@ -318,9 +324,18 @@ namespace Doctrina
         private bool LoadFromFile(string folderPath)
         {
             bool hasNewFiles = true;
-            var fileList = folderPath + @"\" + fileNameListText;
-            var readFile = File.ReadAllLines(fileList, Encoding.GetEncoding("windows-1251"));
-            var realFilesCount = Directory.GetFiles(folderPath, "*Р*.docx", SearchOption.TopDirectoryOnly);
+            var fileList = folderPath + @"\" + FileNameListText;
+            string[] readFile;
+            try
+            {
+                readFile = File.ReadAllLines(fileList, Encoding.GetEncoding("windows-1251"));
+            }
+            catch (Exception e)
+            {
+                OnErrorHappen(e.Message);
+                throw;
+            }
+            var realFilesCount = Directory.GetFiles(folderPath, "*Р?.docx", SearchOption.TopDirectoryOnly);
             if ((readFile.Count() - 1) == realFilesCount.Count())
                 hasNewFiles = false;
             foreach (var line in readFile.Skip(1))
@@ -407,7 +422,7 @@ namespace Doctrina
             {
                 foreach (var questionBlockList in allQuestions)
                 {
-                    wordHlp.CreateFilesFromArray(questionBlockList);
+                    _wordHlp.CreateFilesFromArray(questionBlockList);
                 }
             }
             catch (Exception exception)
@@ -486,7 +501,7 @@ namespace Doctrina
                         if(OnErrorHappenYesNo("Ошибка комбинации возможных вариантов. \r\nСоздаем дамп?"))
                             ErrorLog.CreateDump();
                         ErrorLog.AddNewEntry("Вопросов_на_лист="+MaxQuestionOnListUint+" | Макс_повторов_вопросов= "+ MaxQuestonRepeatUint+ " | Всего_листов= " + MaxLists);
-                        File.Copy(_chooseFolderPath + @"\" + fileNameListText,"ErrorList"+DateTime.Now.Day+DateTime.Now.Hour+DateTime.Now.Minute+".csv");
+                        File.Copy(ChooseFolderPath + @"\" + FileNameListText,"ErrorList"+DateTime.Now.Day+DateTime.Now.Hour+DateTime.Now.Minute+".csv");
                         break;
 
                     }
@@ -499,13 +514,13 @@ namespace Doctrina
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            wordHlp.CloseWord();
+            _wordHlp.CloseWord();
             SaveInit();
-            if (!string.IsNullOrEmpty(_chooseFolderPath))
+            if (!string.IsNullOrEmpty(ChooseFolderPath))
             {
-                SaveDtToFile(_chooseFolderPath);
+                SaveDtToFile(ChooseFolderPath);
             }
-            wordHlp.DeleteAllFilesOnTempDirectory();
+            _wordHlp.DeleteAllFilesOnTempDirectory();
         }
 
         private void MyEventHendler(object sender, FileHlpArgs e)
@@ -519,9 +534,9 @@ namespace Doctrina
             System.Type typeString = System.Type.GetType("System.String");
             System.Type typeUint = System.Type.GetType("System.UInt32");
             System.Type typeDateTime = System.Type.GetType("System.DateTime");
-            DataColumn columnFileName = new DataColumn(colunmNameFileName, typeString);
-            DataColumn columnRepeat = new DataColumn(colunmNameRepeat, typeUint);
-            DataColumn columnLastPrint = new DataColumn(colunmNamelPrintTime, typeDateTime);
+            DataColumn columnFileName = new DataColumn(ColunmNameFileName, typeString);
+            DataColumn columnRepeat = new DataColumn(ColunmNameRepeat, typeUint);
+            DataColumn columnLastPrint = new DataColumn(ColunmNamelPrintTime, typeDateTime);
             columnFileName.ReadOnly = true;
             columnLastPrint.ReadOnly = true;
             columnRepeat.ReadOnly = false;
@@ -534,9 +549,9 @@ namespace Doctrina
         private void addRowToDT(string fileName, uint repeat, DateTime lPrintTime)
         {
             var row = myDT.NewRow();
-            row[colunmNameFileName] = fileName;
-            row[colunmNameRepeat] = repeat;
-            row[colunmNamelPrintTime] = lPrintTime;
+            row[ColunmNameFileName] = fileName;
+            row[ColunmNameRepeat] = repeat;
+            row[ColunmNamelPrintTime] = lPrintTime;
             myDT.Rows.Add(row);
         }
 
@@ -557,10 +572,11 @@ namespace Doctrina
             }
             datagridForDataTable.DataSource = myDT;
             colorTable();
-            if (!string.IsNullOrEmpty(_chooseFolderPath))
+            if (!string.IsNullOrEmpty(ChooseFolderPath))
             {
-                SaveDtToFile(_chooseFolderPath);
+                SaveDtToFile(ChooseFolderPath);
                 SaveInit();
+                ReloadData();
             }
         }
 
@@ -568,7 +584,7 @@ namespace Doctrina
         {
             if (myDT.Rows.Count>1)
             {
-                folderPath = folderPath + @"\" + fileNameListText;
+                folderPath = folderPath + @"\" + FileNameListText;
                 if (!File.Exists(folderPath))
                 {
                     File.Create(folderPath).Close();
@@ -597,7 +613,7 @@ namespace Doctrina
 
         private bool HasFileList(string folderPath)
         {
-            folderPath = folderPath +@"\"+ fileNameListText;
+            folderPath = folderPath +@"\"+ FileNameListText;
             if (File.Exists(folderPath))
                 return true;
             return false;
@@ -609,7 +625,7 @@ namespace Doctrina
 
             foreach (var file in allQuestionFiles)
             {
-                wordHlp.Print(file);
+                _wordHlp.Print(file);
             }
         }
 
@@ -620,7 +636,7 @@ namespace Doctrina
             foreach (var file in allQuestionFiles)
             {
                 if(file.Contains('~')) continue;
-                wordHlp.Print(file);
+                _wordHlp.Print(file);
             }
         }
 
@@ -855,7 +871,7 @@ namespace Doctrina
 
         private void datagridForDataTable_DataError(object sender, DataGridViewDataErrorEventArgs e)
         {
-            if (datagridForDataTable.Columns[e.ColumnIndex].HeaderText != colunmNameRepeat)
+            if (datagridForDataTable.Columns[e.ColumnIndex].HeaderText != ColunmNameRepeat)
             {
                 ErrorLog.AddNewEntry(e.Exception.Message);
                 return;
