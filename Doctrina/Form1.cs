@@ -353,6 +353,10 @@ namespace Doctrina
                 }
 
                 var questionFullName = ReplaceEndOfFile(answerFullName);
+                if (!File.Exists(questionFullName)|| !File.Exists(answerFullName))
+                {
+                    continue;
+                }
                 var repeatTime = Convert.ToUInt32(lines[1]);
                 var lPrintTime = Convert.ToDateTime(lines[2]);
                 doneBlocks.Add(new DoneBlock(questionFullName, answerFullName, lPrintTime, repeatTime));
