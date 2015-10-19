@@ -41,7 +41,23 @@ namespace Doctrina
         {
             get
             {
-                return ShortAnswerPath.Remove(ShortAnswerPath.Length-1);//хз почему но replace сбоит
+                if(ShortAnswerPath.Contains(BannedSymbols.BannedSymbol1))
+                {
+                    return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2,1);
+                }
+                if (ShortAnswerPath.Contains(BannedSymbols.BannedSymbol2))
+                {
+                    return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2,1);
+                }
+                if (ShortAnswerPath.Contains(BannedSymbols.BannedSymbol3))
+                {
+                    return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2,1);
+                }
+                if (ShortAnswerPath.Contains(BannedSymbols.BannedSymbol4))
+                {
+                    return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2,1);
+                }
+                return ShortAnswerPath.Remove(ShortAnswerPath.Length - 1);//хз почему но replace сбоит
             }
         }
 

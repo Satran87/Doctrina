@@ -30,6 +30,7 @@ namespace Doctrina
         private const string MaxQuestionOnListString = "MaxQuestionOnList=";
         private const string MaxQuestionRepeatString = "MaxQuestionRepeat=";
 
+
         private List<List<DoneBlock>> allQuestionsGlobal = new List<List<DoneBlock>>();
 
         private FileHlp wordHlp = new FileHlp();
@@ -256,8 +257,8 @@ namespace Doctrina
 
             if(hasNewFiles)
             {
-                var allAnswerFiles = Directory.GetFiles(folderPath, "*Р.docx", SearchOption.TopDirectoryOnly);
-                var allQuestionFiles = Directory.GetFiles(folderPath, "*У.docx*", SearchOption.TopDirectoryOnly);
+                var allAnswerFiles = Directory.GetFiles(folderPath, "*Р*.docx", SearchOption.TopDirectoryOnly);
+                var allQuestionFiles = Directory.GetFiles(folderPath, "*У*.docx*", SearchOption.TopDirectoryOnly);
                 if (allQuestionFiles.Count() != allAnswerFiles.Count())
                 {
                     OnErrorHappen("Количество вопросов и ответов не совпадает");
@@ -266,15 +267,17 @@ namespace Doctrina
                     
                 foreach (var answerFile in allAnswerFiles)
                 {
-                    var fileName = answerFile;
-                    fileName = fileName.Replace("Р.docx", "У.docx");
+                    var newAnsFile = answerFile;
+                    var fileName = newAnsFile;
+                    fileName = ReplaceEndOfFile(fileName);
+                    
                     if (allQuestionFiles.Contains(fileName))
                     {
-                        var newBlock = new DoneBlock(fileName, answerFile, new DateTime(1900, 1, 1));
+                        var newBlock = new DoneBlock(fileName, newAnsFile, new DateTime(1900, 1, 1));
                         IEnumerable<string> existBlock = from block in doneBlocks
-                            where block.AnswerPath == answerFile
-                            select block.AnswerPath;
-                        if (!existBlock.Contains(answerFile))
+                            where block.AnswerPath == newAnsFile
+                                                         select block.AnswerPath;
+                        if (!existBlock.Contains(newAnsFile))
                         {
                             doneBlocks.Add(newBlock);
                         }
@@ -283,19 +286,73 @@ namespace Doctrina
             } 
         }
 
+        private static string ReplaceEndOfFile(string fileName)
+        {
+            if (fileName.Contains(BannedSymbols.BannedSymbol1))
+            {
+                fileName = fileName.Replace("Р" + BannedSymbols.BannedSymbol1 + ".docx",
+                    "У" + BannedSymbols.BannedSymbol1 + ".docx");
+            }
+            else if (fileName.Contains(BannedSymbols.BannedSymbol2))
+            {
+                fileName = fileName.Replace("Р" + BannedSymbols.BannedSymbol2 + ".docx",
+                    "У" + BannedSymbols.BannedSymbol2 + ".docx");
+            }
+            else if (fileName.Contains(BannedSymbols.BannedSymbol3))
+            {
+                fileName = fileName.Replace("Р" + BannedSymbols.BannedSymbol3 + ".docx",
+                    "У" + BannedSymbols.BannedSymbol3 + ".docx");
+            }
+            else if (fileName.Contains(BannedSymbols.BannedSymbol4))
+            {
+                fileName = fileName.Replace("Р" + BannedSymbols.BannedSymbol4 + ".docx",
+                    "У" + BannedSymbols.BannedSymbol4 + ".docx");
+            }
+            else
+            {
+                fileName = fileName.Replace("Р.docx", "У.docx");
+            }
+            return fileName;
+        }
+
         private bool LoadFromFile(string folderPath)
         {
             bool hasNewFiles = true;
             var fileList = folderPath + @"\" + fileNameListText;
             var readFile = File.ReadAllLines(fileList, Encoding.GetEncoding("windows-1251"));
-            var realFilesCount = Directory.GetFiles(folderPath, "*Р.docx", SearchOption.TopDirectoryOnly);
+            var realFilesCount = Directory.GetFiles(folderPath, "*Р*.docx", SearchOption.TopDirectoryOnly);
             if ((readFile.Count() - 1) == realFilesCount.Count())
                 hasNewFiles = false;
             foreach (var line in readFile.Skip(1))
             {
                 var lines = line.Split(';');
-                var answerFullName = folderPath + @"\" + lines[0] + "Р.docx";
-                var questionFullName = answerFullName.Replace("Р.docx", "У.docx");
+                string answerFullName;
+                if (lines[0].Contains(BannedSymbols.BannedSymbol1))
+                {
+                    lines[0]=lines[0].Remove(lines[0].Length - 1);
+                    answerFullName = folderPath + @"\" + lines[0] + "Р"+ BannedSymbols.BannedSymbol1 + ".docx";
+                }
+                else if (lines[0].Contains(BannedSymbols.BannedSymbol2))
+                {
+                    lines[0] = lines[0].Remove(lines[0].Length - 1);
+                    answerFullName = folderPath + @"\" + lines[0] + "Р" + BannedSymbols.BannedSymbol2 + ".docx";
+                }
+                else if (lines[0].Contains(BannedSymbols.BannedSymbol3))
+                {
+                    lines[0] = lines[0].Remove(lines[0].Length - 1);
+                    answerFullName = folderPath + @"\" + lines[0] + "Р" + BannedSymbols.BannedSymbol3 + ".docx";
+                }
+                else if(lines[0].Contains(BannedSymbols.BannedSymbol4))
+                {
+                    lines[0] = lines[0].Remove(lines[0].Length - 1);
+                    answerFullName = folderPath + @"\" + lines[0] + "Р" + BannedSymbols.BannedSymbol4 + ".docx";
+                }
+                else
+                {
+                    answerFullName = folderPath + @"\" + lines[0] + "Р.docx";
+                }
+
+                var questionFullName = ReplaceEndOfFile(answerFullName);
                 var repeatTime = Convert.ToUInt32(lines[1]);
                 var lPrintTime = Convert.ToDateTime(lines[2]);
                 doneBlocks.Add(new DoneBlock(questionFullName, answerFullName, lPrintTime, repeatTime));
@@ -359,7 +416,10 @@ namespace Doctrina
         private void GetBlocks(ref List<List<DoneBlock>> allQuestions)
         {
             uint someTimer = 0;
-            bool bannedSymbolMeets = false;
+            bool bannedSymbol1Meets = false;
+            bool bannedSymbol2Meets = false;
+            bool bannedSymbol3Meets = false;
+            bool bannedSymbol4Meets = false;
             for (int listNumber = 0; listNumber < MaxLists;)
             {
                 List<DoneBlock> uniqueQuestion = new List<DoneBlock>();
@@ -368,21 +428,54 @@ namespace Doctrina
                     var randBlock = RandomNumber.Between(0, doneBlocks.Count-1);
                     if (!uniqueQuestion.Contains(doneBlocks[randBlock]))
                     {
+                        if (doneBlocks[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol1))
+                        {
+                            if (bannedSymbol1Meets) continue;
+                        }
+                        if (doneBlocks[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol2))
+                        {
+                            if (bannedSymbol2Meets) continue;
+                        }
+                        if (doneBlocks[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol3))
+                        {
+                            if (bannedSymbol3Meets) continue;
+                        }
+                        if (doneBlocks[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol4))
+                        {
+                            if (bannedSymbol4Meets) continue;
+                        }
                         if (doneBlocks[randBlock].AllowPrint(MaxQuestonRepeatUint, DateThenAllowPrint))
                         {
-                            if (doneBlocks[randBlock].AnswerPath.Contains('!'))
+                           if (doneBlocks[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol1))
+                           {
+                               bannedSymbol1Meets = true;
+                               uniqueQuestion.Add(doneBlocks[randBlock]);
+                               ++questions;
+                           }
+                           else if (doneBlocks[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol2))
                             {
-                                if (bannedSymbolMeets) continue;
-                                bannedSymbolMeets = true;
+                                bannedSymbol2Meets = true;
+                                uniqueQuestion.Add(doneBlocks[randBlock]);
+                                ++questions;
+                            }
+                           else if (doneBlocks[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol3))
+                            {
+                                bannedSymbol3Meets = true;
+                                uniqueQuestion.Add(doneBlocks[randBlock]);
+                                ++questions;
+                            }
+                           else if (doneBlocks[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol4))
+                            {
+                                bannedSymbol4Meets = true;
                                 uniqueQuestion.Add(doneBlocks[randBlock]);
                                 ++questions;
                             }
                             else
-                            {
-                                uniqueQuestion.Add(doneBlocks[randBlock]);
-                                ++questions;
-                            }
-                        }
+                           {
+                               uniqueQuestion.Add(doneBlocks[randBlock]);
+                               ++questions;
+                           }
+                        }   
                     }
                     if (someTimer >= 60000)
                     {

@@ -98,6 +98,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BannedSymbols.cs" />
     <Compile Include="Checks.cs" />
     <Compile Include="DoneBlock.cs" />
     <Compile Include="ErrorLog.cs" />
