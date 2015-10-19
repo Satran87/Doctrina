@@ -435,12 +435,12 @@ namespace Doctrina
         private void GetBlocks(ref List<List<DoneBlock>> allQuestions)
         {
             uint someTimer = 0;
-            bool bannedSymbol1Meets = false;
-            bool bannedSymbol2Meets = false;
-            bool bannedSymbol3Meets = false;
-            bool bannedSymbol4Meets = false;
             for (int listNumber = 0; listNumber < MaxLists;)
             {
+                bool bannedSymbol1Meets = false;
+                bool bannedSymbol2Meets = false;
+                bool bannedSymbol3Meets = false;
+                bool bannedSymbol4Meets = false;
                 List<DoneBlock> uniqueQuestion = new List<DoneBlock>();
                 for (int questions = 0; questions < MaxQuestionOnListUint;)
                 {

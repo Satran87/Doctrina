@@ -70,12 +70,12 @@ namespace Doctrina
         {
             List<DoneBlock> randBlockCopy = CopyDoneBlocks(form1.doneBlocks);
             uint someTimer = 0;
-            bool bannedSymbol1Meets = false;
-            bool bannedSymbol2Meets = false;
-            bool bannedSymbol3Meets = false;
-            bool bannedSymbol4Meets = false;
             for (int listNumber = 0; listNumber < form1.MaxLists;)
             {
+                bool bannedSymbol1Meets = false;
+                bool bannedSymbol2Meets = false;
+                bool bannedSymbol3Meets = false;
+                bool bannedSymbol4Meets = false;
                 List<DoneBlock> uniqueQuestion = new List<DoneBlock>();
                 for (int questions = 0; questions < form1.MaxQuestionOnListUint;)
                 {
