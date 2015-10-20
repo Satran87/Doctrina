@@ -2,19 +2,11 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
-using System.Security.Cryptography;
-using System.Security.Policy;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.Office.Interop.Word;
-using DataTable = System.Data.DataTable;
 
 namespace Doctrina
 {
@@ -31,7 +23,7 @@ namespace Doctrina
         private const string MaxQuestionRepeatString = "MaxQuestionRepeat=";
 
 
-        private List<List<DoneBlock>> allQuestionsGlobal = new List<List<DoneBlock>>();
+        private List<List<DoneBlock>> _allQuestionsGlobal = new List<List<DoneBlock>>();
 
         private FileHlp _wordHlp = new FileHlp();
 
@@ -87,16 +79,16 @@ namespace Doctrina
         private uint _maxQuestonRepeatUint = 5;
         private uint _maxLists = 5;
         internal DateTime DateThenAllowPrint;
-        internal DataTable myDT;
+        internal DataTable MyDt;
         internal string ChooseFolderPath = null;
         /// <summary>
         /// Готовый комплект вопросов
         /// </summary>
-        internal List<DoneBlock> doneBlocks = new List<DoneBlock>();
+        internal List<DoneBlock> DoneBlocks = new List<DoneBlock>();
         /// <summary>
         /// Копия блоков до запуска. В случае ошибки через них идет отмена.
         /// </summary>
-        internal List<DoneBlock> doneBlocks_oldCopy = new List<DoneBlock>();
+        internal List<DoneBlock> DoneBlocksOldCopy = new List<DoneBlock>();
 
         public Form1()
         {
@@ -161,11 +153,11 @@ namespace Doctrina
         {
             try
             {
-                allQuestionsGlobal.Clear();
+                _allQuestionsGlobal.Clear();
                 SetTextinThread("Получаем список");
-                GetBlocks(ref allQuestionsGlobal);
+                GetBlocks(ref _allQuestionsGlobal);
                 SetTextinThread("Создаем файлы для печати");
-                CreateDocxFiles(allQuestionsGlobal);
+                CreateDocxFiles(_allQuestionsGlobal);
                 SetTextinThread("Печатаем");
                 if (allCheckBox.Checked)
                 {
@@ -182,14 +174,14 @@ namespace Doctrina
                     SetBoolInThread(true);
                 }
                 SetTextinThread("");
-                doneBlocks_oldCopy.Clear();
-                doneBlocks_oldCopy=CheckClass.CopyDoneBlocks(doneBlocks);
+                DoneBlocksOldCopy.Clear();
+                DoneBlocksOldCopy=CheckClass.CopyDoneBlocks(DoneBlocks);
             }
             catch (Exception e)
             {
                 ErrorLog.AddNewEntry(e.Message);
-                doneBlocks.Clear();
-                doneBlocks = CheckClass.CopyDoneBlocks(doneBlocks_oldCopy);
+                DoneBlocks.Clear();
+                DoneBlocks = CheckClass.CopyDoneBlocks(DoneBlocksOldCopy);
                 _wordHlp.CloseWord();
                 _wordHlp.DeleteAllFilesOnTempDirectory();
                 if (OnErrorHappenYesNo("Произошла ошибка \r\n" + e.Message + "\r\nЗакрыть программу?"))
@@ -243,8 +235,8 @@ namespace Doctrina
 
         private void ReloadData()
         {
-            doneBlocks.Clear();
-            allQuestionsGlobal.Clear();
+            DoneBlocks.Clear();
+            _allQuestionsGlobal.Clear();
             GetAllFileFromFolder(ChooseFolderPath);
             FillList();
         }
@@ -280,12 +272,12 @@ namespace Doctrina
                     if (allQuestionFiles.Contains(fileName))
                     {
                         var newBlock = new DoneBlock(fileName, newAnsFile, new DateTime(1900, 1, 1));
-                        IEnumerable<string> existBlock = from block in doneBlocks
+                        IEnumerable<string> existBlock = from block in DoneBlocks
                             where block.AnswerPath == newAnsFile
                                                          select block.AnswerPath;
                         if (!existBlock.Contains(newAnsFile))
                         {
-                            doneBlocks.Add(newBlock);
+                            DoneBlocks.Add(newBlock);
                         }
                     }
                 }
@@ -377,15 +369,15 @@ namespace Doctrina
                 }
                 var repeatTime = Convert.ToUInt32(lines[1]);
                 var lPrintTime = Convert.ToDateTime(lines[2]);
-                doneBlocks.Add(new DoneBlock(questionFullName, answerFullName, lPrintTime, repeatTime));
+                DoneBlocks.Add(new DoneBlock(questionFullName, answerFullName, lPrintTime, repeatTime));
             }
             return hasNewFiles;
         }
 
         private void FillList()
         {
-            myDT.Clear();
-            foreach (var block in doneBlocks)
+            MyDt.Clear();
+            foreach (var block in DoneBlocks)
             {
                 addRowToDT(block.ShortFileName, block.TimeRepeated, block.LastTimePrint);
             }
@@ -396,8 +388,8 @@ namespace Doctrina
         {
             cancelButton.Enabled = true;
             DateThenAllowPrint = dateThenAllowPrintPicker.Value;
-            doneBlocks_oldCopy.Clear();
-            doneBlocks_oldCopy = CheckClass.CopyDoneBlocks(doneBlocks);
+            DoneBlocksOldCopy.Clear();
+            DoneBlocksOldCopy = CheckClass.CopyDoneBlocks(DoneBlocks);
             try
             {
                 MaxQuestionOnListUint = Convert.ToUInt32(MaxQuestionOnListText.Text);
@@ -447,54 +439,54 @@ namespace Doctrina
                 List<DoneBlock> uniqueQuestion = new List<DoneBlock>();
                 for (int questions = 0; questions < MaxQuestionOnListUint;)
                 {
-                    var randBlock = RandomNumber.Between(0, doneBlocks.Count-1);
-                    if (!uniqueQuestion.Contains(doneBlocks[randBlock]))
+                    var randBlock = RandomNumber.Between(0, DoneBlocks.Count-1);
+                    if (!uniqueQuestion.Contains(DoneBlocks[randBlock]))
                     {
-                        if (doneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol1))
+                        if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol1))
                         {
                             if (bannedSymbol1Meets) continue;
                         }
-                        if (doneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol2))
+                        if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol2))
                         {
                             if (bannedSymbol2Meets) continue;
                         }
-                        if (doneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol3))
+                        if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol3))
                         {
                             if (bannedSymbol3Meets) continue;
                         }
-                        if (doneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol4))
+                        if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol4))
                         {
                             if (bannedSymbol4Meets) continue;
                         }
-                        if (doneBlocks[randBlock].AllowPrint(MaxQuestonRepeatUint, DateThenAllowPrint))
+                        if (DoneBlocks[randBlock].AllowPrint(MaxQuestonRepeatUint, DateThenAllowPrint))
                         {
-                           if (doneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol1))
+                           if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol1))
                            {
                                bannedSymbol1Meets = true;
-                               uniqueQuestion.Add(doneBlocks[randBlock]);
+                               uniqueQuestion.Add(DoneBlocks[randBlock]);
                                ++questions;
                            }
-                           else if (doneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol2))
+                           else if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol2))
                             {
                                 bannedSymbol2Meets = true;
-                                uniqueQuestion.Add(doneBlocks[randBlock]);
+                                uniqueQuestion.Add(DoneBlocks[randBlock]);
                                 ++questions;
                             }
-                           else if (doneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol3))
+                           else if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol3))
                             {
                                 bannedSymbol3Meets = true;
-                                uniqueQuestion.Add(doneBlocks[randBlock]);
+                                uniqueQuestion.Add(DoneBlocks[randBlock]);
                                 ++questions;
                             }
-                           else if (doneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol4))
+                           else if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol4))
                             {
                                 bannedSymbol4Meets = true;
-                                uniqueQuestion.Add(doneBlocks[randBlock]);
+                                uniqueQuestion.Add(DoneBlocks[randBlock]);
                                 ++questions;
                             }
                             else
                            {
-                               uniqueQuestion.Add(doneBlocks[randBlock]);
+                               uniqueQuestion.Add(DoneBlocks[randBlock]);
                                ++questions;
                            }
                         }   
@@ -531,49 +523,49 @@ namespace Doctrina
            // progressBar1.Value = howManyDocxWasMade;
         }
 
-        private void CreateDT()
+        private void CreateDt()
         {
-            myDT = new DataTable();
-            System.Type typeString = System.Type.GetType("System.String");
-            System.Type typeUint = System.Type.GetType("System.UInt32");
-            System.Type typeDateTime = System.Type.GetType("System.DateTime");
+            MyDt = new DataTable();
+            Type typeString = Type.GetType("System.String");
+            Type typeUint = Type.GetType("System.UInt32");
+            Type typeDateTime = Type.GetType("System.DateTime");
             DataColumn columnFileName = new DataColumn(ColunmNameFileName, typeString);
             DataColumn columnRepeat = new DataColumn(ColunmNameRepeat, typeUint);
             DataColumn columnLastPrint = new DataColumn(ColunmNamelPrintTime, typeDateTime);
             columnFileName.ReadOnly = true;
             columnLastPrint.ReadOnly = true;
             columnRepeat.ReadOnly = false;
-            myDT.Columns.Add(columnFileName);
-            myDT.Columns.Add(columnRepeat);
-            myDT.Columns.Add(columnLastPrint);
-            datagridForDataTable.DataSource = myDT;
+            MyDt.Columns.Add(columnFileName);
+            MyDt.Columns.Add(columnRepeat);
+            MyDt.Columns.Add(columnLastPrint);
+            datagridForDataTable.DataSource = MyDt;
         }
 
         private void addRowToDT(string fileName, uint repeat, DateTime lPrintTime)
         {
-            var row = myDT.NewRow();
+            var row = MyDt.NewRow();
             row[ColunmNameFileName] = fileName;
             row[ColunmNameRepeat] = repeat;
             row[ColunmNamelPrintTime] = lPrintTime;
-            myDT.Rows.Add(row);
+            MyDt.Rows.Add(row);
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            CreateDT();
+            CreateDt();
         }
 
         private void datagridForDataTable_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            this.BindingContext[(DataTable) datagridForDataTable.DataSource].EndCurrentEdit();
+            BindingContext[(DataTable) datagridForDataTable.DataSource].EndCurrentEdit();
             var tempDT = ((DataTable) datagridForDataTable.DataSource).GetChanges();
             if (tempDT != null)
             {
-                myDT.Clear();
-                myDT = tempDT;
+                MyDt.Clear();
+                MyDt = tempDT;
                 ((DataTable) datagridForDataTable.DataSource).AcceptChanges();
             }
-            datagridForDataTable.DataSource = myDT;
+            datagridForDataTable.DataSource = MyDt;
             colorTable();
             if (!string.IsNullOrEmpty(ChooseFolderPath))
             {
@@ -585,7 +577,7 @@ namespace Doctrina
 
         private void SaveDtToFile(string folderPath)
         {
-            if (myDT.Rows.Count>1)
+            if (MyDt.Rows.Count>1)
             {
                 folderPath = folderPath + @"\" + FileNameListText;
                 if (!File.Exists(folderPath))
@@ -594,10 +586,10 @@ namespace Doctrina
                 }
 
                 StringBuilder sb = new StringBuilder();
-                IEnumerable<string> columnNames = myDT.Columns.Cast<DataColumn>().
+                IEnumerable<string> columnNames = MyDt.Columns.Cast<DataColumn>().
                     Select(column => column.ColumnName);
                 sb.AppendLine(string.Join(";", columnNames));
-                foreach (DataRow row in myDT.Rows)
+                foreach (DataRow row in MyDt.Rows)
                 {
                     IEnumerable<string> fields = row.ItemArray.Select(field => field.ToString());
 
@@ -609,7 +601,7 @@ namespace Doctrina
                 }
                 catch (Exception e)
                 {
-
+                    OnErrorHappen(e.Message);
                 }
             }
         }
@@ -756,7 +748,7 @@ namespace Doctrina
         private void cancelButton_Click(object sender, EventArgs e)
         {
             backgroundWorker1.CancelAsync();
-            allQuestionsGlobal.Clear();
+            _allQuestionsGlobal.Clear();
 
         }
 
@@ -886,7 +878,7 @@ namespace Doctrina
         private void CheckPassword()
         {
             PassCheck myPassCheck = new PassCheck();
-            myPassCheck.ShowDialog(this.Owner);
+            myPassCheck.ShowDialog(Owner);
             if (myPassCheck.DialogResult == DialogResult.OK)
             {
                 if (!myPassCheck.HaskOk)

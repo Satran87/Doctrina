@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Printing;
-using System.Windows.Forms;
 using Microsoft.Office.Interop.Word;
-using Application = Microsoft.Office.Interop.Word.Application;
 
 namespace Doctrina
 {
@@ -22,38 +20,10 @@ namespace Doctrina
             myWord.Visible = false;
         }
 
-        public IDataObject ReadTextFromDoc(string pathToDoc,bool ans, string fileName)
+        private void GenerateDocFiles(string newFileName,string oldFileName, bool isAnswer)
         {
-            Document doc = null;
-            try
-            {
-                doc = myWord.Documents.Open(FileName: pathToDoc, Visible: false);
-                doc.ActiveWindow.Selection.WholeStory();
-                doc.ActiveWindow.Selection.Copy();
-            }
-            catch (Exception e)
-            {
-                doc.Close();
-                ErrorLog.AddNewEntry(e.Message);
-                DeleteAllFilesOnTempDirectory();
-                throw new Exception("Ошибка при чтении документа");
-            }
-            
-            doc.Close();
-            var data = Clipboard.GetDataObject();
-            NewSaveFile(ans, fileName, pathToDoc);
-            return data;
-        }
-
-        private List<string> colontitul;
-        private int t = 0;
-
-        private void NewSaveFile(bool isAnswer,string newFileName,string oldFileName)
-        {
-            object unit;
-            object extend;
-            unit = WdUnits.wdStory;
-            extend = WdMovementType.wdMove;
+            object unit = WdUnits.wdStory;
+            object extend = WdMovementType.wdMove;
             Document doc = null;
             bool isDocExist = false;
             if (!Directory.Exists("TempFolder"))
@@ -77,7 +47,6 @@ namespace Doctrina
                 {
                     doc = myWord.Documents.Open(fullName);
                     isDocExist = true;
-                    ++t;
                 }
                 else
                 {
@@ -93,15 +62,15 @@ namespace Doctrina
                 else
                 {
                     myWord.Selection.EndKey(ref unit, ref extend);
-                    myWord.Selection.Paste();
+                    myWord.Selection.InsertFile(oldFileName);
                 }
-            }
+        }
             catch (Exception e)
             {
                 doc.Close();
                 ErrorLog.AddNewEntry(e.Message);
                 DeleteAllFilesOnTempDirectory();
-                throw new Exception("Ошибка при сохранении документа из буфера");
+                throw new Exception("Ошибка при создании файла");
             }
             doc.SaveAs(FileName: fullName);
             doc.Close();
@@ -117,17 +86,13 @@ namespace Doctrina
             return GetCurrentDirectory()+ @"\"+@"TempFolder\";
         }
 
-        private string randName;
         public void CreateFilesFromArray(List<DoneBlock> doneBlocks)
         {
-            colontitul = new List<string>(); 
-            t = 0;
-            var name=Path.GetRandomFileName();
-            randName = name;
+            var randomFileName=Path.GetRandomFileName();
             foreach (var block in doneBlocks)
             {
-                ReadTextFromDoc(block.AnswerPath,true, name);
-                ReadTextFromDoc(block.QuestionPath,false, name);
+                GenerateDocFiles(randomFileName, block.AnswerPath, true);
+                GenerateDocFiles(randomFileName, block.QuestionPath, false);
             }
             OnMyEvent(new FileHlpArgs());
         }

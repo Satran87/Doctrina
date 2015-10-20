@@ -5,13 +5,13 @@ namespace Doctrina
 {
     public static class RandomNumber
     {
-        private static readonly RNGCryptoServiceProvider _generator = new RNGCryptoServiceProvider();
+        private static readonly RNGCryptoServiceProvider Generator = new RNGCryptoServiceProvider();
 
         public static int Between(int minimumValue, int maximumValue)
         {
             byte[] randomNumber = new byte[1];
 
-            _generator.GetBytes(randomNumber);
+            Generator.GetBytes(randomNumber);
 
             double asciiValueOfRandomCharacter = Convert.ToDouble(randomNumber[0]);
 

@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Security.Policy;
 using System.Text;
 using System.Windows.Forms;
 
@@ -25,7 +19,7 @@ namespace Doctrina
                 var myHash= GetMd5Hash(md5Hash, textBox1.Text);
                 HaskOk=VerifyMd5Hash(myHash);
             }
-            this.DialogResult = DialogResult.OK;
+            DialogResult = DialogResult.OK;
         }
 
         public bool HaskOk;

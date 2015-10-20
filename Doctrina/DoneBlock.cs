@@ -61,13 +61,13 @@ namespace Doctrina
             }
         }
 
-        public bool AllowPrint(uint maxRepeat, DateTime TimeAllowPrint)
+        public bool AllowPrint(uint maxRepeat, DateTime timeAllowPrint)
         {
-            var currentTimeStamp = DateTime.Now - TimeAllowPrint;
+            var currentTimeStamp = DateTime.Now - timeAllowPrint;
             var checkdT = _lastPrintTime.Add(currentTimeStamp);
-            if (_timeRepeat < maxRepeat || checkdT >= TimeAllowPrint)
+            if (_timeRepeat < maxRepeat || checkdT >= timeAllowPrint)
             {
-                if (checkdT >= TimeAllowPrint && _timeRepeat >= maxRepeat)
+                if (checkdT >= timeAllowPrint && _timeRepeat >= maxRepeat)
                 {
                     _timeRepeat = 0;
                 }
