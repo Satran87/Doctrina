@@ -294,31 +294,34 @@ namespace Doctrina
 
         private static string ReplaceEndOfFile(string fileName)
         {
-            if (fileName.Contains(BannedSymbols.BannedSymbol1))
+            var shortfileName=Path.GetFileName(fileName);
+            var pathToFolder= Path.GetDirectoryName(fileName);
+
+            if (shortfileName.Contains(BannedSymbols.BannedSymbol1))
             {
-                fileName = fileName.Replace("Р" + BannedSymbols.BannedSymbol1 + ".docx",
+                shortfileName = shortfileName.Replace("Р" + BannedSymbols.BannedSymbol1 + ".docx",
                     "У" + BannedSymbols.BannedSymbol1 + ".docx");
             }
-            else if (fileName.Contains(BannedSymbols.BannedSymbol2))
+            else if (shortfileName.Contains(BannedSymbols.BannedSymbol2))
             {
-                fileName = fileName.Replace("Р" + BannedSymbols.BannedSymbol2 + ".docx",
+                shortfileName = shortfileName.Replace("Р" + BannedSymbols.BannedSymbol2 + ".docx",
                     "У" + BannedSymbols.BannedSymbol2 + ".docx");
             }
-            else if (fileName.Contains(BannedSymbols.BannedSymbol3))
+            else if (shortfileName.Contains(BannedSymbols.BannedSymbol3))
             {
-                fileName = fileName.Replace("Р" + BannedSymbols.BannedSymbol3 + ".docx",
+                shortfileName = shortfileName.Replace("Р" + BannedSymbols.BannedSymbol3 + ".docx",
                     "У" + BannedSymbols.BannedSymbol3 + ".docx");
             }
-            else if (fileName.Contains(BannedSymbols.BannedSymbol4))
+            else if (shortfileName.Contains(BannedSymbols.BannedSymbol4))
             {
-                fileName = fileName.Replace("Р" + BannedSymbols.BannedSymbol4 + ".docx",
+                shortfileName = shortfileName.Replace("Р" + BannedSymbols.BannedSymbol4 + ".docx",
                     "У" + BannedSymbols.BannedSymbol4 + ".docx");
             }
             else
             {
-                fileName = fileName.Replace("Р.docx", "У.docx");
+                shortfileName = shortfileName.Replace("Р.docx", "У.docx");
             }
-            return fileName;
+            return pathToFolder+@"\"+ shortfileName;
         }
 
         private bool LoadFromFile(string folderPath)
@@ -447,43 +450,43 @@ namespace Doctrina
                     var randBlock = RandomNumber.Between(0, doneBlocks.Count-1);
                     if (!uniqueQuestion.Contains(doneBlocks[randBlock]))
                     {
-                        if (doneBlocks[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol1))
+                        if (doneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol1))
                         {
                             if (bannedSymbol1Meets) continue;
                         }
-                        if (doneBlocks[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol2))
+                        if (doneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol2))
                         {
                             if (bannedSymbol2Meets) continue;
                         }
-                        if (doneBlocks[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol3))
+                        if (doneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol3))
                         {
                             if (bannedSymbol3Meets) continue;
                         }
-                        if (doneBlocks[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol4))
+                        if (doneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol4))
                         {
                             if (bannedSymbol4Meets) continue;
                         }
                         if (doneBlocks[randBlock].AllowPrint(MaxQuestonRepeatUint, DateThenAllowPrint))
                         {
-                           if (doneBlocks[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol1))
+                           if (doneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol1))
                            {
                                bannedSymbol1Meets = true;
                                uniqueQuestion.Add(doneBlocks[randBlock]);
                                ++questions;
                            }
-                           else if (doneBlocks[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol2))
+                           else if (doneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol2))
                             {
                                 bannedSymbol2Meets = true;
                                 uniqueQuestion.Add(doneBlocks[randBlock]);
                                 ++questions;
                             }
-                           else if (doneBlocks[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol3))
+                           else if (doneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol3))
                             {
                                 bannedSymbol3Meets = true;
                                 uniqueQuestion.Add(doneBlocks[randBlock]);
                                 ++questions;
                             }
-                           else if (doneBlocks[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol4))
+                           else if (doneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol4))
                             {
                                 bannedSymbol4Meets = true;
                                 uniqueQuestion.Add(doneBlocks[randBlock]);

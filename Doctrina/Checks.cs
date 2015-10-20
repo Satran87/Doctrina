@@ -82,43 +82,43 @@ namespace Doctrina
                     var randBlock = RandomNumber.Between(0, randBlockCopy.Count - 1);
                     if (!uniqueQuestion.Contains(randBlockCopy[randBlock]))
                     {
-                        if (randBlockCopy[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol1))
+                        if (randBlockCopy[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol1))
                         {
                             if (bannedSymbol1Meets) continue;
                         }
-                        if (randBlockCopy[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol2))
+                        if (randBlockCopy[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol2))
                         {
                             if (bannedSymbol2Meets) continue;
                         }
-                        if (randBlockCopy[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol3))
+                        if (randBlockCopy[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol3))
                         {
                             if (bannedSymbol3Meets) continue;
                         }
-                        if (randBlockCopy[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol4))
+                        if (randBlockCopy[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol4))
                         {
                             if (bannedSymbol4Meets) continue;
                         }
                         if (randBlockCopy[randBlock].AllowPrint(form1.MaxQuestonRepeatUint, form1.DateThenAllowPrint))
                         {
-                            if (randBlockCopy[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol1))
+                            if (randBlockCopy[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol1))
                             {
                                 bannedSymbol1Meets = true;
                                 uniqueQuestion.Add(randBlockCopy[randBlock]);
                                 ++questions;
                             }
-                            else if (randBlockCopy[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol2))
+                            else if (randBlockCopy[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol2))
                             {
                                 bannedSymbol2Meets = true;
                                 uniqueQuestion.Add(randBlockCopy[randBlock]);
                                 ++questions;
                             }
-                            else if (randBlockCopy[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol3))
+                            else if (randBlockCopy[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol3))
                             {
                                 bannedSymbol3Meets = true;
                                 uniqueQuestion.Add(randBlockCopy[randBlock]);
                                 ++questions;
                             }
-                            else if (randBlockCopy[randBlock].AnswerPath.Contains(BannedSymbols.BannedSymbol4))
+                            else if (randBlockCopy[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol4))
                             {
                                 bannedSymbol4Meets = true;
                                 uniqueQuestion.Add(randBlockCopy[randBlock]);
