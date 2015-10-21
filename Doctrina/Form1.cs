@@ -422,7 +422,7 @@ namespace Doctrina
             }
             catch (Exception exception)
             {
-                ErrorLog.AddNewEntry(exception.Message);
+                OnErrorHappen(exception.Message);
             }
             
         }
