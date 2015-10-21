@@ -88,12 +88,15 @@ namespace Doctrina
 
         public void CreateFilesFromArray(List<DoneBlock> doneBlocks)
         {
+            List<string>printingNames=new List<string>();
             var randomFileName=Path.GetRandomFileName();
             foreach (var block in doneBlocks)
             {
                 GenerateDocFiles(randomFileName, block.AnswerPath, true);
                 GenerateDocFiles(randomFileName, block.QuestionPath, false);
+                printingNames.Add(block.ShortFileName);
             }
+            WorkLog.AddNewEntry(printingNames.ToArray());
             OnMyEvent(new FileHlpArgs());
         }
 
