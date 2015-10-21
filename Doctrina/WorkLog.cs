@@ -9,7 +9,7 @@ namespace Doctrina
     {
         private static string _directoryName = "PrintStatistics";
         private  const string DocString = "Документ_";
-        public static void AddNewEntry(string [] writedDocks)
+        public static void AddNewEntry(string [] writedDocks,string folderName)
         {
             int docNumber = 0;
             if (!Directory.Exists(_directoryName))
@@ -33,7 +33,7 @@ namespace Doctrina
                 var tempDocString = DocString + docNumber;
                 using (var sw = new StreamWriter(fileName, true, Encoding.GetEncoding("windows-1251")))
                 {
-                    sw.WriteLine("{0};{1}", tempDocString, tempString);
+                    sw.WriteLine("{0};{1}{2}{3}", tempDocString, tempString,"Из папки: ",folderName);
                     sw.Close();
                 }
         }

@@ -6,6 +6,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace Doctrina
@@ -413,11 +414,13 @@ namespace Doctrina
 
         private void CreateDocxFiles(List<List<DoneBlock>> allQuestions)
         {
+            int counterForFile = 1;
             try
             {
                 foreach (var questionBlockList in allQuestions)
                 {
-                    _wordHlp.CreateFilesFromArray(questionBlockList);
+                    _wordHlp.CreateFilesFromArray(questionBlockList, counterForFile);
+                    ++counterForFile;
                 }
             }
             catch (Exception exception)
@@ -617,9 +620,10 @@ namespace Doctrina
         private void PrintQuestion(string folderPath)
         {
             var allQuestionFiles = Directory.GetFiles(folderPath, "*Ques.docx", SearchOption.TopDirectoryOnly);
-
+            NumericalSort(allQuestionFiles);
             foreach (var file in allQuestionFiles)
             {
+                if (file.Contains('~')) continue;
                 _wordHlp.Print(file);
             }
         }
@@ -627,7 +631,7 @@ namespace Doctrina
         private void PrintAnswer(string folderPath)
         {
             var allQuestionFiles = Directory.GetFiles(folderPath, "*Ans.docx", SearchOption.TopDirectoryOnly);
-
+            NumericalSort(allQuestionFiles);
             foreach (var file in allQuestionFiles)
             {
                 if(file.Contains('~')) continue;
@@ -640,7 +644,27 @@ namespace Doctrina
             PrintQuestion(folderPath);
             PrintAnswer(folderPath);
         }
+        public static void NumericalSort(string[] ar)
+        {
+            Regex rgx = new Regex("([^0-9]*)([0-9]+)");
+            Array.Sort(ar, (a, b) =>
+            {
+                var ma = rgx.Matches(a);
+                var mb = rgx.Matches(b);
+                for (int i = 0; i < ma.Count; ++i)
+                {
+                    int ret = ma[i].Groups[1].Value.CompareTo(mb[i].Groups[1].Value);
+                    if (ret != 0)
+                        return ret;
 
+                    ret = int.Parse(ma[i].Groups[2].Value) - int.Parse(mb[i].Groups[2].Value);
+                    if (ret != 0)
+                        return ret;
+                }
+
+                return 0;
+            });
+        }
 
         private void timer1_Tick(object sender, EventArgs e)
         {

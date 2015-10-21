@@ -86,17 +86,19 @@ namespace Doctrina
             return GetCurrentDirectory()+ @"\"+@"TempFolder\";
         }
 
-        public void CreateFilesFromArray(List<DoneBlock> doneBlocks)
+        public void CreateFilesFromArray(List<DoneBlock> doneBlocks,int counter)
         {
             List<string>printingNames=new List<string>();
-            var randomFileName=Path.GetRandomFileName();
+            var randomFileName= counter +"_"+ Path.GetRandomFileName();
+            string folderBlock=string.Empty;
             foreach (var block in doneBlocks)
             {
                 GenerateDocFiles(randomFileName, block.AnswerPath, true);
                 GenerateDocFiles(randomFileName, block.QuestionPath, false);
                 printingNames.Add(block.ShortFileName);
+                folderBlock = block.AnswerFolder;
             }
-            WorkLog.AddNewEntry(printingNames.ToArray());
+            WorkLog.AddNewEntry(printingNames.ToArray(), folderBlock);
             OnMyEvent(new FileHlpArgs());
         }
 

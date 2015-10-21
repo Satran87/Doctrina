@@ -37,6 +37,16 @@ namespace Doctrina
         {
             get { return Path.GetFileNameWithoutExtension(_answerPath); }
         }
+
+        public string AnswerFolder
+        {
+
+            get
+            {
+                var temp=new DirectoryInfo(Path.GetDirectoryName(_answerPath)).Name;
+                return temp;
+            }
+        }
         public string ShortFileName
         {
             get
