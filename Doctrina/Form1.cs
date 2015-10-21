@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using Doctrina.eEgg;
 
 namespace Doctrina
 {
@@ -817,17 +818,81 @@ namespace Doctrina
         private void NumberOfLists_TextChanged(object sender, EventArgs e)
         {
             MaxLists=string.IsNullOrEmpty(NumberOfLists.Text) ? 0: Convert.ToUInt32(NumberOfLists.Text);
+            //
+            if (!MaxQuestionOnListSecond && !MaxQuestionRepeatThird)
+            {
+                ListFirst = true;
+            }
+            else
+            {
+                ListFirst = false;
+                MaxQuestionOnListSecond = false;
+                MaxQuestionRepeatThird = false;
+            }
         }
+        #region eEgg
 
+        private bool ListFirst = false;
+        private bool MaxQuestionOnListSecond = false;
+        private bool MaxQuestionRepeatThird = false;
+        private bool played = false;
+        #endregion
         private void MaxQuestionRepeatText_TextChanged(object sender, EventArgs e)
         {
             MaxQuestonRepeatUint = string.IsNullOrEmpty(MaxQuestionRepeatText.Text) ? 0 : Convert.ToUInt32(MaxQuestionRepeatText.Text);
             colorTable();
+            //
+            //
+            if (ListFirst && MaxQuestionOnListSecond)
+            {
+                MaxQuestionRepeatThird = true;
+            }
+            else
+            {
+                ListFirst = false;
+                MaxQuestionOnListSecond = false;
+                MaxQuestionRepeatThird = false;
+            }
+            ///
+            if (!played)
+            {
+                if (ListFirst && MaxQuestionOnListSecond && MaxQuestionRepeatThird)
+                {
+                    if (MaxLists == 557)
+                    {
+                        if (MaxQuestionOnListUint == 30)
+                        {
+                            if (MaxQuestonRepeatUint == 27)
+                            {
+                                if (DateThenAllowPrint.Year == 2050)
+                                {
+                                    EEggPlayer fun = new EEggPlayer();
+                                    fun.ShowDialog(Owner);
+                                    ErrorLog.AddNewEntry("Это всё же кто-то увидел -))");
+                                    played = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
         }
 
         private void MaxQuestionOnListText_TextChanged(object sender, EventArgs e)
         {
             MaxQuestionOnListUint = string.IsNullOrEmpty(MaxQuestionOnListText.Text) ? 0 : Convert.ToUInt32(MaxQuestionOnListText.Text);
+            //
+            if (ListFirst && !MaxQuestionRepeatThird)
+            {
+                MaxQuestionOnListSecond = true;
+            }
+            else
+            {
+                ListFirst = false;
+                MaxQuestionOnListSecond = false;
+                MaxQuestionRepeatThird = false;
+            }
         }
 
         private void dateThenAllowPrintPicker_ValueChanged(object sender, EventArgs e)
@@ -906,6 +971,11 @@ namespace Doctrina
         private void datagridForDataTable_ColumnHeaderMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             colorTable();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
