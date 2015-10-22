@@ -67,6 +67,22 @@ namespace Doctrina
                 {
                     return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2,1);
                 }
+                if (ShortAnswerPath.Contains(BannedSymbols.BannedSymbol5))
+                {
+                    return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2, 1);
+                }
+                if (ShortAnswerPath.Contains(BannedSymbols.BannedSymbol6))
+                {
+                    return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2, 1);
+                }
+                if (ShortAnswerPath.Contains(BannedSymbols.BannedSymbol7))
+                {
+                    return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2, 1);
+                }
+                if (ShortAnswerPath.Contains(BannedSymbols.BannedSymbol8))
+                {
+                    return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2, 1);
+                }
                 return ShortAnswerPath.Remove(ShortAnswerPath.Length - 1);//хз почему но replace сбоит
             }
         }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Printing;
 using System.Text.RegularExpressions;
 using Microsoft.Office.Interop.Word;
+using System.Threading;
 
 namespace Doctrina
 {
@@ -47,6 +48,7 @@ namespace Doctrina
                 if (File.Exists(fullName))
                 {
                     doc = myWord.Documents.Open(fullName);
+                    Thread.Sleep(100);//Возможны проблемы с документом. Тормознуть.
                     isDocExist = true;
                 }
                 else
@@ -95,6 +97,7 @@ namespace Doctrina
             foreach (var block in doneBlocks)
             {
                 GenerateDocFiles(randomFileName, block.AnswerPath, true);//TODO:Переделать код на однокартый вызов doc для документа
+                Thread.Sleep(100);//Возможны проблемы с документом. Тормознуть.
                 GenerateDocFiles(randomFileName, block.QuestionPath, false);
                 printingNames.Add(block.ShortFileName);
                 folderBlock = block.AnswerFolder;

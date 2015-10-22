@@ -16,6 +16,12 @@ namespace Doctrina
             {
                 Directory.CreateDirectory(_directoryName);
             }
+            string currentData = DateTime.Now.Year + "_" + DateTime.Now.Month + "_"
+                                 + DateTime.Now.Day;
+            if (!Directory.Exists(currentData))
+            {
+                Directory.CreateDirectory(currentData);
+            }
             var fileName= _directoryName + @"\"+ DateTime.Now.Year + "_"+ DateTime.Now.Month+"_"
             +DateTime.Now.Day + ".csv";
 
