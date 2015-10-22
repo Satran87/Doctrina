@@ -48,7 +48,7 @@ namespace Doctrina
                 if (File.Exists(fullName))
                 {
                     doc = myWord.Documents.Open(fullName);
-                    Thread.Sleep(100);//Возможны проблемы с документом. Тормознуть.
+                    Thread.Sleep(20);//Возможны проблемы с документом. Тормознуть.
                     isDocExist = true;
                 }
                 else
@@ -60,11 +60,13 @@ namespace Doctrina
                 {
                     myWord.Selection.EndKey(ref unit, ref extend);
                     myWord.Selection.InsertBreak(WdBreakType.wdSectionBreakNextPage);
+                    Thread.Sleep(20);//Возможны проблемы с документом. Тормознуть.
                     myWord.Selection.InsertFile(oldFileName);
                 }
                 else
                 {
                     myWord.Selection.EndKey(ref unit, ref extend);
+                    Thread.Sleep(20);//Возможны проблемы с документом. Тормознуть.
                     myWord.Selection.InsertFile(oldFileName);
                 }
         }
@@ -97,7 +99,7 @@ namespace Doctrina
             foreach (var block in doneBlocks)
             {
                 GenerateDocFiles(randomFileName, block.AnswerPath, true);//TODO:Переделать код на однокартый вызов doc для документа
-                Thread.Sleep(100);//Возможны проблемы с документом. Тормознуть.
+                Thread.Sleep(10);//Возможны проблемы с документом. Тормознуть.
                 GenerateDocFiles(randomFileName, block.QuestionPath, false);
                 printingNames.Add(block.ShortFileName);
                 folderBlock = block.AnswerFolder;
