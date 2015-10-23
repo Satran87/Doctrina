@@ -7,8 +7,10 @@ namespace Doctrina
 {
     internal static class CheckClass
     {
-        public static bool Cheks(Form1 form1)
+        public static bool Cheks(Form1 form1,string selectedFolder)
         {
+            if (folderCheck(form1,selectedFolder))
+                return true;
             //NOTE:Может потом сделать более точную проверку
             return CheckAlllOther(form1);
         }
@@ -142,6 +144,29 @@ namespace Doctrina
         {
             List<DoneBlock> copyedList = doneBlocks.Select(doneBlock => new DoneBlock(doneBlock.QuestionPath, doneBlock.AnswerPath, doneBlock.LastTimePrint, doneBlock.TimeRepeated)).ToList();
             return copyedList;
+        }
+
+        public static bool folderCheck(Form1 form1,string folderPath)
+        {
+            var tempAnsDir = Path.GetDirectoryName(folderPath);
+            var splitedLines = tempAnsDir.Split('\\');
+            string dirName = String.Empty;
+            try
+            {
+                dirName = splitedLines[splitedLines.Count() - 2];//Директория с папкой
+                if (dirName.Contains(":"))
+                {
+                    form1.OnErrorHappen("Строка для папки указывает на корень");
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                form1.OnErrorHappen("Не получилось выделить папку с папками");
+                ErrorLog.AddNewEntry(e.Message);
+                return true;
+            }
+            return false;
         }
     }
 

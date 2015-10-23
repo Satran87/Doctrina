@@ -8,22 +8,23 @@ namespace Doctrina
     public static class WorkLog
     {
         private static string _directoryName = "PrintStatistics";
+        private const string DocName = "ФайлСоСпискомПечати.csv";
         private  const string DocString = "Документ_";
-        public static void AddNewEntry(string [] writedDocks,string folderName)
+        public static void AddNewEntry(string [] writedDocks,string folderName,string folderWithFolders)
         {
             int docNumber = 0;
             if (!Directory.Exists(_directoryName))
             {
                 Directory.CreateDirectory(_directoryName);
             }
-            string currentData = DateTime.Now.Year + "_" + DateTime.Now.Month + "_"
-                                 + DateTime.Now.Day;
-            if (!Directory.Exists(currentData))
+            string folderForFile = _directoryName + @"\" + folderWithFolders +@"\"+ folderName+@"\";
+            if (!Directory.Exists(folderForFile))
             {
-                Directory.CreateDirectory(currentData);
+                Directory.CreateDirectory(folderForFile);
             }
-            var fileName= _directoryName + @"\"+ DateTime.Now.Year + "_"+ DateTime.Now.Month+"_"
-            +DateTime.Now.Day + ".csv";
+            //var fileName= folderForFile + DateTime.Now.Year + "_"+ DateTime.Now.Month+"_"
+            //+DateTime.Now.Day + ".csv";
+            var fileName = folderForFile + DocName;
 
                 if (!File.Exists(fileName))
                 {
@@ -39,7 +40,7 @@ namespace Doctrina
                 var tempDocString = DocString + docNumber;
                 using (var sw = new StreamWriter(fileName, true, Encoding.GetEncoding("windows-1251")))
                 {
-                    sw.WriteLine("{0};{1}{2}{3}", tempDocString, tempString,"Из папки: ",folderName);
+                    sw.WriteLine("{0};{1}", tempDocString, tempString);
                     sw.Close();
                 }
         }

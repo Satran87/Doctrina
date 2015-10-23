@@ -95,16 +95,18 @@ namespace Doctrina
         {
             List<string>printingNames=new List<string>();
             var randomFileName= counter +"_"+ Path.GetRandomFileName();
-            string folderBlock=string.Empty;
+            string folderWithFiles=string.Empty;
+            string folderWithFolders = string.Empty;
             foreach (var block in doneBlocks)
             {
                 GenerateDocFiles(randomFileName, block.AnswerPath, true);//TODO:Переделать код на однокартый вызов doc для документа
                 Thread.Sleep(10);//Возможны проблемы с документом. Тормознуть.
                 GenerateDocFiles(randomFileName, block.QuestionPath, false);
                 printingNames.Add(block.ShortFileName);
-                folderBlock = block.AnswerFolder;
+                folderWithFiles = block.AnswerFolder;
+                folderWithFolders = block.FolderWithAnswerDirectory;
             }
-            WorkLog.AddNewEntry(printingNames.ToArray(), folderBlock);
+            WorkLog.AddNewEntry(printingNames.ToArray(), folderWithFiles,folderWithFolders);
             OnMyEvent(new FileHlpArgs());
         }
 

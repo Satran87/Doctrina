@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 
 namespace Doctrina
 {
@@ -40,11 +41,29 @@ namespace Doctrina
 
         public string AnswerFolder
         {
-
             get
             {
                 var temp=new DirectoryInfo(Path.GetDirectoryName(_answerPath)).Name;
                 return temp;
+            }
+        }
+        public string FolderWithAnswerDirectory
+        {
+            get
+            {
+              var tempAnsDir = Path.GetDirectoryName(_answerPath);
+              var splitedLines=  tempAnsDir.Split('\\');
+                string dirName=String.Empty;
+                try
+                {
+                dirName = splitedLines[splitedLines.Count() - 2];//Директория с папкой
+                }
+                catch (Exception e)
+                {                 
+                    throw new Exception(e.Message);
+                }
+               
+                return dirName;
             }
         }
         public string ShortFileName

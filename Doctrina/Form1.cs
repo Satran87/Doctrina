@@ -429,6 +429,7 @@ namespace Doctrina
         private void RunButton_Click(object sender, EventArgs e)
         {
             cancelButton.Enabled = true;
+            PrintLastButton.Visible = false;
             DateThenAllowPrint = dateThenAllowPrintPicker.Value;
             DoneBlocksOldCopy.Clear();
             DoneBlocksOldCopy = CheckClass.CopyDoneBlocks(DoneBlocks);
@@ -445,7 +446,7 @@ namespace Doctrina
             }
 
 
-            if (CheckClass.Cheks(this)) return;
+            if (CheckClass.Cheks(this,currentFolderTextBox.Text)) return;
             timer1.Start();
             progressBar1.Style = ProgressBarStyle.Marquee;
             backgroundWorker1.RunWorkerAsync();     
