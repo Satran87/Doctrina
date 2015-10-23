@@ -98,7 +98,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BannedSymbols.cs" />
     <Compile Include="Checks.cs" />
     <Compile Include="DoneBlock.cs" />
     <Compile Include="eEgg\eEggPlayer.cs">
@@ -129,6 +128,7 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="BannedSymbolsClass.cs" />
     <Compile Include="WorkLog.cs" />
     <EmbeddedResource Include="eEgg\eEggPlayer.resx">
       <DependentUpon>eEggPlayer.cs</DependentUpon>

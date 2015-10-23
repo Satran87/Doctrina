@@ -6,12 +6,14 @@ namespace Doctrina
 {
     public class DoneBlock
     {
-        public DoneBlock(string qPath, string aPath, DateTime lPrintTime, uint timeRepeated = 0)
+        private readonly Form1 _myForm;
+        public DoneBlock(Form1 form, string qPath, string aPath, DateTime lPrintTime, uint timeRepeated = 0)
         {
             _questionPath = qPath;
             _answerPath = aPath;
             _timeRepeat = timeRepeated;
             _lastPrintTime = lPrintTime;
+            _myForm = form;
 
         }
         public string QuestionPath
@@ -70,37 +72,12 @@ namespace Doctrina
         {
             get
             {
-                if(ShortAnswerPath.Contains(BannedSymbols.BannedSymbol1))
+                foreach (var bannedSymbol in _myForm.NewBannedSymbols1.BannedSymbolsList)
                 {
-                    return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2,1);
-                }
-                if (ShortAnswerPath.Contains(BannedSymbols.BannedSymbol2))
-                {
-                    return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2,1);
-                }
-                if (ShortAnswerPath.Contains(BannedSymbols.BannedSymbol3))
-                {
-                    return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2,1);
-                }
-                if (ShortAnswerPath.Contains(BannedSymbols.BannedSymbol4))
-                {
-                    return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2,1);
-                }
-                if (ShortAnswerPath.Contains(BannedSymbols.BannedSymbol5))
-                {
-                    return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2, 1);
-                }
-                if (ShortAnswerPath.Contains(BannedSymbols.BannedSymbol6))
-                {
-                    return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2, 1);
-                }
-                if (ShortAnswerPath.Contains(BannedSymbols.BannedSymbol7))
-                {
-                    return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2, 1);
-                }
-                if (ShortAnswerPath.Contains(BannedSymbols.BannedSymbol8))
-                {
-                    return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2, 1);
+                    if (ShortAnswerPath.Contains(bannedSymbol))
+                    {
+                        return ShortAnswerPath.Remove(ShortAnswerPath.Length - 2, 1);
+                    }
                 }
                 return ShortAnswerPath.Remove(ShortAnswerPath.Length - 1);//хз почему но replace сбоит
             }

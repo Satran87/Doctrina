@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Printing;
 using System.Text.RegularExpressions;
 using Microsoft.Office.Interop.Word;
@@ -22,6 +23,53 @@ namespace Doctrina
             myWord.Visible = false;
         }
 
+        private void NewGenerateDoc(List<DoneBlock> doneBlocks, string newFileName, bool isAnswer)
+        {
+            object unit = WdUnits.wdStory;
+            object extend = WdMovementType.wdMove;
+            Document doc = null;
+            if (doneBlocks.Count <= 0)
+                return;
+            if (!Directory.Exists("TempFolder"))
+            {
+                Directory.CreateDirectory("TempFolder");
+
+            }
+            newFileName = GetTempDirectory() + newFileName;
+            if (isAnswer)
+            {
+                newFileName = newFileName + "_Ans";
+            }
+            else
+            {
+                newFileName = newFileName + "_Ques";
+            }
+            string fullName = newFileName + ".docx";
+            try
+            {
+                doc = myWord.Documents.Add();
+                myWord.Selection.EndKey(ref unit, ref extend);
+                Thread.Sleep(20); //Возможны проблемы с документом. Тормознуть.
+                myWord.Selection.InsertFile(isAnswer ? doneBlocks[0].AnswerPath : doneBlocks[0].QuestionPath);
+                foreach (var doneBlock in doneBlocks.Skip(1))
+                {
+                    Thread.Sleep(20); //Возможны проблемы с документом. Тормознуть.
+                    myWord.Selection.EndKey(ref unit, ref extend);
+                    myWord.Selection.InsertBreak(WdBreakType.wdSectionBreakNextPage);
+                    Thread.Sleep(20); //Возможны проблемы с документом. Тормознуть.
+                    myWord.Selection.InsertFile(isAnswer ? doneBlock.AnswerPath : doneBlock.QuestionPath);
+                }
+                doc.SaveAs(FileName: fullName);
+                doc.Close();
+            }
+            catch (Exception e)
+            {
+                doc.Close();
+                ErrorLog.AddNewEntry(e.Message);
+                DeleteAllFilesOnTempDirectory();
+                throw new Exception("Ошибка при создании файла");
+            }
+        }
         private void GenerateDocFiles(string newFileName,string oldFileName, bool isAnswer)
         {
             object unit = WdUnits.wdStory;
@@ -93,20 +141,24 @@ namespace Doctrina
 
         public void CreateFilesFromArray(List<DoneBlock> doneBlocks,int counter)
         {
-            List<string>printingNames=new List<string>();
-            var randomFileName= counter +"_"+ Path.GetRandomFileName();
-            string folderWithFiles=string.Empty;
-            string folderWithFolders = string.Empty;
-            foreach (var block in doneBlocks)
-            {
-                GenerateDocFiles(randomFileName, block.AnswerPath, true);//TODO:Переделать код на однокартый вызов doc для документа
-                Thread.Sleep(10);//Возможны проблемы с документом. Тормознуть.
-                GenerateDocFiles(randomFileName, block.QuestionPath, false);
-                printingNames.Add(block.ShortFileName);
-                folderWithFiles = block.AnswerFolder;
-                folderWithFolders = block.FolderWithAnswerDirectory;
-            }
-            WorkLog.AddNewEntry(printingNames.ToArray(), folderWithFiles,folderWithFolders);
+            
+            if(doneBlocks.Count<=0)
+                return;
+            var randomFileName = counter + "_" + Path.GetRandomFileName();
+            NewGenerateDoc(doneBlocks, randomFileName, true);
+            NewGenerateDoc(doneBlocks, randomFileName, false);
+            string folderWithFiles = doneBlocks[0].AnswerFolder;
+            string folderWithFolders = doneBlocks[0].FolderWithAnswerDirectory;
+            //foreach (var block in doneBlocks)
+            //{
+            //    GenerateDocFiles(randomFileName, block.AnswerPath, true);//TODO:Переделать код на однокартый вызов doc для документа
+            //    Thread.Sleep(10);//Возможны проблемы с документом. Тормознуть.
+            //    GenerateDocFiles(randomFileName, block.QuestionPath, false);
+            //    printingNames.Add(block.ShortFileName);
+            //    folderWithFiles = block.AnswerFolder;
+            //    folderWithFolders = block.FolderWithAnswerDirectory;
+            //}
+            WorkLog.AddNewEntry(doneBlocks.Select(doneblock => doneblock.ShortFileName).ToArray(), folderWithFiles,folderWithFolders);
             OnMyEvent(new FileHlpArgs());
         }
 

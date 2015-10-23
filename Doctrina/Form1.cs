@@ -6,7 +6,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using Doctrina.eEgg;
 
@@ -23,6 +22,8 @@ namespace Doctrina
         private const string NumberOfListsString = "NumberOfLists=";
         private const string MaxQuestionOnListString = "MaxQuestionOnList=";
         private const string MaxQuestionRepeatString = "MaxQuestionRepeat=";
+        private const string BannedSymbolsString = "BannedSymbols=";
+        internal BannedSymbolsClass NewBannedSymbols1;
 
 
         private List<List<DoneBlock>> _allQuestionsGlobal = new List<List<DoneBlock>>();
@@ -147,6 +148,11 @@ namespace Doctrina
                     MaxQuestonRepeatUint = Convert.ToUInt32(newLine);
                     continue;
                 }
+                if (line.Contains(BannedSymbolsString))
+                {
+                    var bannedSymbols= line.Replace(BannedSymbolsString, "");
+                    NewBannedSymbols1 = new BannedSymbolsClass(bannedSymbols.Split('|'));
+                }
             }
         }
 
@@ -177,13 +183,13 @@ namespace Doctrina
                 }
                 SetTextinThread("");
                 DoneBlocksOldCopy.Clear();
-                DoneBlocksOldCopy=CheckClass.CopyDoneBlocks(DoneBlocks);
+                DoneBlocksOldCopy=CheckClass.CopyDoneBlocks(this,DoneBlocks);
             }
             catch (Exception e)
             {
                 ErrorLog.AddNewEntry(e.Message);
                 DoneBlocks.Clear();
-                DoneBlocks = CheckClass.CopyDoneBlocks(DoneBlocksOldCopy);
+                DoneBlocks = CheckClass.CopyDoneBlocks(this,DoneBlocksOldCopy);
                 _wordHlp.CloseWord();
                 _wordHlp.DeleteAllFilesOnTempDirectory();
                 if (OnErrorHappenYesNo("Произошла ошибка \r\n" + e.Message + "\r\nЗакрыть программу?"))
@@ -211,12 +217,10 @@ namespace Doctrina
                     Environment.Exit(0);
                 }
             }
-            
         }
 
         private void chooseFolderButton_Click(object sender, EventArgs e)
         {
-
             var dlgResult = folderDialog.ShowDialog();
             if (!string.IsNullOrEmpty(ChooseFolderPath))
             {
@@ -232,7 +236,6 @@ namespace Doctrina
                 PrintLastButton.Visible = false;
                 ReloadData();
             }
-            
         }
 
         private void ReloadData()
@@ -273,7 +276,7 @@ namespace Doctrina
                     
                     if (allQuestionFiles.Contains(fileName))
                     {
-                        var newBlock = new DoneBlock(fileName, newAnsFile, new DateTime(1900, 1, 1));
+                        var newBlock = new DoneBlock(this,fileName, newAnsFile, new DateTime(1900, 1, 1));
                         IEnumerable<string> existBlock = from block in DoneBlocks
                             where block.AnswerPath == newAnsFile
                                                          select block.AnswerPath;
@@ -286,56 +289,25 @@ namespace Doctrina
             } 
         }
 
-        private static string ReplaceEndOfFile(string fileName)
+        private  string ReplaceEndOfFile(string fileName)
         {
             var shortfileName=Path.GetFileName(fileName);
             var pathToFolder= Path.GetDirectoryName(fileName);
-
-            if (shortfileName.Contains(BannedSymbols.BannedSymbol1))
+            bool contain = false;
+            foreach (var bannedSymbol in NewBannedSymbols1.BannedSymbolsList)
             {
-                shortfileName = shortfileName.Replace("Р" + BannedSymbols.BannedSymbol1 + ".docx",
-                    "У" + BannedSymbols.BannedSymbol1 + ".docx");
+                if (shortfileName.Contains(bannedSymbol))
+                {
+                    shortfileName = shortfileName.Replace("Р" + bannedSymbol + ".docx",
+                   "У" + bannedSymbol + ".docx");
+                    contain = true;
+                }
             }
-            else if (shortfileName.Contains(BannedSymbols.BannedSymbol2))
-            {
-                shortfileName = shortfileName.Replace("Р" + BannedSymbols.BannedSymbol2 + ".docx",
-                    "У" + BannedSymbols.BannedSymbol2 + ".docx");
-            }
-            else if (shortfileName.Contains(BannedSymbols.BannedSymbol3))
-            {
-                shortfileName = shortfileName.Replace("Р" + BannedSymbols.BannedSymbol3 + ".docx",
-                    "У" + BannedSymbols.BannedSymbol3 + ".docx");
-            }
-            else if (shortfileName.Contains(BannedSymbols.BannedSymbol4))
-            {
-                shortfileName = shortfileName.Replace("Р" + BannedSymbols.BannedSymbol4 + ".docx",
-                    "У" + BannedSymbols.BannedSymbol4 + ".docx");
-            }
-            else if (shortfileName.Contains(BannedSymbols.BannedSymbol5))
-            {
-                shortfileName = shortfileName.Replace("Р" + BannedSymbols.BannedSymbol5 + ".docx",
-                    "У" + BannedSymbols.BannedSymbol5 + ".docx");
-            }
-            else if (shortfileName.Contains(BannedSymbols.BannedSymbol6))
-            {
-                shortfileName = shortfileName.Replace("Р" + BannedSymbols.BannedSymbol6 + ".docx",
-                    "У" + BannedSymbols.BannedSymbol6 + ".docx");
-            }
-            else if (shortfileName.Contains(BannedSymbols.BannedSymbol7))
-            {
-                shortfileName = shortfileName.Replace("Р" + BannedSymbols.BannedSymbol7 + ".docx",
-                    "У" + BannedSymbols.BannedSymbol7 + ".docx");
-            }
-            else if (shortfileName.Contains(BannedSymbols.BannedSymbol8))
-            {
-                shortfileName = shortfileName.Replace("Р" + BannedSymbols.BannedSymbol8 + ".docx",
-                    "У" + BannedSymbols.BannedSymbol8 + ".docx");
-            }
-            else
+            if (!contain)
             {
                 shortfileName = shortfileName.Replace("Р.docx", "У.docx");
             }
-            return pathToFolder+@"\"+ shortfileName;
+            return pathToFolder + @"\" + shortfileName;
         }
 
         private bool LoadFromFile(string folderPath)
@@ -358,52 +330,21 @@ namespace Doctrina
             foreach (var line in readFile.Skip(1))
             {
                 var lines = line.Split(';');
-                string answerFullName;
-                if (lines[0].Contains(BannedSymbols.BannedSymbol1))
+                string answerFullName=string.Empty;
+                bool contain = false;
+                foreach (var bannedSymbol in NewBannedSymbols1.BannedSymbolsList)
                 {
-                    lines[0]=lines[0].Remove(lines[0].Length - 1);
-                    answerFullName = folderPath + @"\" + lines[0] + "Р"+ BannedSymbols.BannedSymbol1 + ".docx";
+                    if (lines[0].Contains(bannedSymbol))
+                    {
+                        lines[0] = lines[0].Remove(lines[0].Length - 1);
+                        answerFullName = folderPath + @"\" + lines[0] + "Р" + bannedSymbol + ".docx";
+                        contain = true;
+                    }
                 }
-                else if (lines[0].Contains(BannedSymbols.BannedSymbol2))
-                {
-                    lines[0] = lines[0].Remove(lines[0].Length - 1);
-                    answerFullName = folderPath + @"\" + lines[0] + "Р" + BannedSymbols.BannedSymbol2 + ".docx";
-                }
-                else if (lines[0].Contains(BannedSymbols.BannedSymbol3))
-                {
-                    lines[0] = lines[0].Remove(lines[0].Length - 1);
-                    answerFullName = folderPath + @"\" + lines[0] + "Р" + BannedSymbols.BannedSymbol3 + ".docx";
-                }
-                else if(lines[0].Contains(BannedSymbols.BannedSymbol4))
-                {
-                    lines[0] = lines[0].Remove(lines[0].Length - 1);
-                    answerFullName = folderPath + @"\" + lines[0] + "Р" + BannedSymbols.BannedSymbol4 + ".docx";
-                }
-                else if (lines[0].Contains(BannedSymbols.BannedSymbol5))
-                {
-                    lines[0] = lines[0].Remove(lines[0].Length - 1);
-                    answerFullName = folderPath + @"\" + lines[0] + "Р" + BannedSymbols.BannedSymbol5 + ".docx";
-                }
-                else if (lines[0].Contains(BannedSymbols.BannedSymbol6))
-                {
-                    lines[0] = lines[0].Remove(lines[0].Length - 1);
-                    answerFullName = folderPath + @"\" + lines[0] + "Р" + BannedSymbols.BannedSymbol6 + ".docx";
-                }
-                else if (lines[0].Contains(BannedSymbols.BannedSymbol7))
-                {
-                    lines[0] = lines[0].Remove(lines[0].Length - 1);
-                    answerFullName = folderPath + @"\" + lines[0] + "Р" + BannedSymbols.BannedSymbol7 + ".docx";
-                }
-                else if (lines[0].Contains(BannedSymbols.BannedSymbol8))
-                {
-                    lines[0] = lines[0].Remove(lines[0].Length - 1);
-                    answerFullName = folderPath + @"\" + lines[0] + "Р" + BannedSymbols.BannedSymbol8 + ".docx";
-                }
-                else
+                if(!contain)
                 {
                     answerFullName = folderPath + @"\" + lines[0] + "Р.docx";
                 }
-
                 var questionFullName = ReplaceEndOfFile(answerFullName);
                 if (!File.Exists(questionFullName)|| !File.Exists(answerFullName))
                 {
@@ -411,7 +352,7 @@ namespace Doctrina
                 }
                 var repeatTime = Convert.ToUInt32(lines[1]);
                 var lPrintTime = Convert.ToDateTime(lines[2]);
-                DoneBlocks.Add(new DoneBlock(questionFullName, answerFullName, lPrintTime, repeatTime));
+                DoneBlocks.Add(new DoneBlock(this,questionFullName, answerFullName, lPrintTime, repeatTime));
             }
             return hasNewFiles;
         }
@@ -429,10 +370,9 @@ namespace Doctrina
         private void RunButton_Click(object sender, EventArgs e)
         {
             cancelButton.Enabled = true;
-            PrintLastButton.Visible = false;
             DateThenAllowPrint = dateThenAllowPrintPicker.Value;
             DoneBlocksOldCopy.Clear();
-            DoneBlocksOldCopy = CheckClass.CopyDoneBlocks(DoneBlocks);
+            DoneBlocksOldCopy = CheckClass.CopyDoneBlocks(this,DoneBlocks);
             try
             {
                 MaxQuestionOnListUint = Convert.ToUInt32(MaxQuestionOnListText.Text);
@@ -474,126 +414,7 @@ namespace Doctrina
 
         private void GetBlocks(ref List<List<DoneBlock>> allQuestions)
         {
-            uint someTimer = 0;
-            for (int listNumber = 0; listNumber < MaxLists;)
-            {
-                bool bannedSymbol1Meets = false;
-                bool bannedSymbol2Meets = false;
-                bool bannedSymbol3Meets = false;
-                bool bannedSymbol4Meets = false;
-                bool bannedSymbol5Meets = false;
-                bool bannedSymbol6Meets = false;
-                bool bannedSymbol7Meets = false;
-                bool bannedSymbol8Meets = false;
-                List<DoneBlock> uniqueQuestion = new List<DoneBlock>();
-                for (int questions = 0; questions < MaxQuestionOnListUint;)
-                {
-                    var randBlock = RandomNumber.Between(0, DoneBlocks.Count-1);
-                    if (!uniqueQuestion.Contains(DoneBlocks[randBlock]))
-                    {
-                        if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol1))
-                        {
-                            if (bannedSymbol1Meets) continue;
-                        }
-                        if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol2))
-                        {
-                            if (bannedSymbol2Meets) continue;
-                        }
-                        if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol3))
-                        {
-                            if (bannedSymbol3Meets) continue;
-                        }
-                        if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol4))
-                        {
-                            if (bannedSymbol4Meets) continue;
-                        }
-                        if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol5))
-                        {
-                            if (bannedSymbol5Meets) continue;
-                        }
-                        if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol6))
-                        {
-                            if (bannedSymbol6Meets) continue;
-                        }
-                        if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol7))
-                        {
-                            if (bannedSymbol7Meets) continue;
-                        }
-                        if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol8))
-                        {
-                            if (bannedSymbol8Meets) continue;
-                        }
-                        if (DoneBlocks[randBlock].AllowPrint(MaxQuestonRepeatUint, DateThenAllowPrint))
-                        {
-                           if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol1))
-                           {
-                               bannedSymbol1Meets = true;
-                               uniqueQuestion.Add(DoneBlocks[randBlock]);
-                               ++questions;
-                           }
-                           else if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol2))
-                            {
-                                bannedSymbol2Meets = true;
-                                uniqueQuestion.Add(DoneBlocks[randBlock]);
-                                ++questions;
-                            }
-                           else if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol3))
-                            {
-                                bannedSymbol3Meets = true;
-                                uniqueQuestion.Add(DoneBlocks[randBlock]);
-                                ++questions;
-                            }
-                           else if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol4))
-                            {
-                                bannedSymbol4Meets = true;
-                                uniqueQuestion.Add(DoneBlocks[randBlock]);
-                                ++questions;
-                            }
-                            else if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol5))
-                            {
-                                bannedSymbol5Meets = true;
-                                uniqueQuestion.Add(DoneBlocks[randBlock]);
-                                ++questions;
-                            }
-                            else if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol6))
-                            {
-                                bannedSymbol6Meets = true;
-                                uniqueQuestion.Add(DoneBlocks[randBlock]);
-                                ++questions;
-                            }
-                            else if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol7))
-                            {
-                                bannedSymbol7Meets = true;
-                                uniqueQuestion.Add(DoneBlocks[randBlock]);
-                                ++questions;
-                            }
-                            else if (DoneBlocks[randBlock].ShortFileName.Contains(BannedSymbols.BannedSymbol8))
-                            {
-                                bannedSymbol8Meets = true;
-                                uniqueQuestion.Add(DoneBlocks[randBlock]);
-                                ++questions;
-                            }
-                            else
-                           {
-                               uniqueQuestion.Add(DoneBlocks[randBlock]);
-                               ++questions;
-                           }
-                        }   
-                    }
-                    if (someTimer >= 60000)
-                    {
-                        if(OnErrorHappenYesNo("Ошибка комбинации возможных вариантов. \r\nСоздаем дамп?"))
-                            ErrorLog.CreateDump();
-                        ErrorLog.AddNewEntry("Вопросов_на_лист="+MaxQuestionOnListUint+" | Макс_повторов_вопросов= "+ MaxQuestonRepeatUint+ " | Всего_листов= " + MaxLists);
-                        File.Copy(ChooseFolderPath + @"\" + FileNameListText,"ErrorList"+DateTime.Now.Day+DateTime.Now.Hour+DateTime.Now.Minute+".csv");
-                        break;
-
-                    }
-                    ++someTimer;
-                }
-                allQuestions.Add(uniqueQuestion);
-                ++listNumber;
-            }
+            CheckClass.GetBlocks_1(this, ref DoneBlocks, ref allQuestions);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -736,14 +557,17 @@ namespace Doctrina
             progressBar1.Style = ProgressBarStyle.Marquee;
             if (backgroundWorker1.IsBusy || backgroundWorker2.IsBusy)
             {
+                
                 RunButton.Enabled = false;
                 chooseFolderButton.Enabled = false;
-
+                PrintLastButton.Visible = false;
                 MaxQuestionOnListText.Enabled = false;
                 MaxQuestionRepeatText.Enabled = false;
                 NumberOfLists.Enabled = false;
                 dateThenAllowPrintPicker.Enabled = false;
                 allCheckBox.Enabled = false;
+                answerCheckBox.Enabled = false;
+                questionCheckBox.Enabled = false;
                 datagridForDataTable.Enabled = false;
             }
             else
@@ -756,6 +580,8 @@ namespace Doctrina
                 NumberOfLists.Enabled = true;
                 dateThenAllowPrintPicker.Enabled = true;
                 allCheckBox.Enabled = true;
+                answerCheckBox.Enabled = true;
+                questionCheckBox.Enabled = true;
                 datagridForDataTable.Enabled = true;
 
                 cancelButton.Enabled = false;
@@ -961,7 +787,6 @@ namespace Doctrina
                     }
                 }
             }
-            
         }
 
         private void MaxQuestionOnListText_TextChanged(object sender, EventArgs e)
@@ -1056,11 +881,6 @@ namespace Doctrina
         private void datagridForDataTable_ColumnHeaderMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             colorTable();
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }
