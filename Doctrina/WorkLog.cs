@@ -9,7 +9,7 @@ namespace Doctrina
     {
         private static string _directoryName = "PrintStatistics";
         private const string DocName = "ФайлСоСпискомПечати.csv";
-        private  const string DocString = "Документ_";
+        private  const string DocString = "Билет_";
         public static void AddNewEntry(string [] writedDocks,string folderName,string folderWithFolders)
         {
             int docNumber = 0;
