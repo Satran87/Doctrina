@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.folderDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.chooseFolderButton = new System.Windows.Forms.Button();
             this.MaxQuestionOnListText = new System.Windows.Forms.TextBox();
@@ -54,6 +54,8 @@
             this.cancelButton = new System.Windows.Forms.Button();
             this.PrintLastButton = new System.Windows.Forms.Button();
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
+            this.OnlyGeneratorRadioButon = new System.Windows.Forms.RadioButton();
+            this.GeneratorAndConstRadioButton = new System.Windows.Forms.RadioButton();
             ((System.ComponentModel.ISupportInitialize)(this.datagridForDataTable)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
@@ -159,14 +161,14 @@
             this.datagridForDataTable.AllowUserToResizeColumns = false;
             this.datagridForDataTable.AllowUserToResizeRows = false;
             this.datagridForDataTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.datagridForDataTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.datagridForDataTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.datagridForDataTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.datagridForDataTable.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnKeystroke;
             this.datagridForDataTable.Location = new System.Drawing.Point(355, 12);
@@ -175,6 +177,7 @@
             this.datagridForDataTable.RowHeadersVisible = false;
             this.datagridForDataTable.Size = new System.Drawing.Size(493, 341);
             this.datagridForDataTable.TabIndex = 12;
+            this.datagridForDataTable.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.datagridForDataTable_CellBeginEdit);
             this.datagridForDataTable.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.datagridForDataTable_CellEndEdit);
             this.datagridForDataTable.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.datagridForDataTable_ColumnHeaderMouseClick);
             this.datagridForDataTable.ColumnHeaderMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.datagridForDataTable_ColumnHeaderMouseDoubleClick);
@@ -294,11 +297,37 @@
             this.backgroundWorker2.WorkerReportsProgress = true;
             this.backgroundWorker2.WorkerSupportsCancellation = true;
             // 
+            // OnlyGeneratorRadioButon
+            // 
+            this.OnlyGeneratorRadioButon.AutoSize = true;
+            this.OnlyGeneratorRadioButon.Checked = true;
+            this.OnlyGeneratorRadioButon.Location = new System.Drawing.Point(25, 381);
+            this.OnlyGeneratorRadioButon.Name = "OnlyGeneratorRadioButon";
+            this.OnlyGeneratorRadioButon.Size = new System.Drawing.Size(129, 17);
+            this.OnlyGeneratorRadioButon.TabIndex = 20;
+            this.OnlyGeneratorRadioButon.TabStop = true;
+            this.OnlyGeneratorRadioButon.Text = "Стандартный режим";
+            this.OnlyGeneratorRadioButon.UseVisualStyleBackColor = true;
+            this.OnlyGeneratorRadioButon.CheckedChanged += new System.EventHandler(this.OnlyGeneratorRadioButon_CheckedChanged);
+            // 
+            // GeneratorAndConstRadioButton
+            // 
+            this.GeneratorAndConstRadioButton.AutoSize = true;
+            this.GeneratorAndConstRadioButton.Location = new System.Drawing.Point(164, 381);
+            this.GeneratorAndConstRadioButton.Name = "GeneratorAndConstRadioButton";
+            this.GeneratorAndConstRadioButton.Size = new System.Drawing.Size(193, 17);
+            this.GeneratorAndConstRadioButton.TabIndex = 21;
+            this.GeneratorAndConstRadioButton.Text = "Стандартный режим + константа";
+            this.GeneratorAndConstRadioButton.UseVisualStyleBackColor = true;
+            this.GeneratorAndConstRadioButton.CheckedChanged += new System.EventHandler(this.GeneratorAndConstRadioButton_CheckedChanged);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(860, 365);
+            this.ClientSize = new System.Drawing.Size(860, 419);
+            this.Controls.Add(this.GeneratorAndConstRadioButton);
+            this.Controls.Add(this.OnlyGeneratorRadioButon);
             this.Controls.Add(this.PrintLastButton);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.currentStatusTextBox);
@@ -355,6 +384,8 @@
         private System.Windows.Forms.Button cancelButton;
         private System.Windows.Forms.Button PrintLastButton;
         private System.ComponentModel.BackgroundWorker backgroundWorker2;
+        private System.Windows.Forms.RadioButton OnlyGeneratorRadioButon;
+        private System.Windows.Forms.RadioButton GeneratorAndConstRadioButton;
     }
 }
 

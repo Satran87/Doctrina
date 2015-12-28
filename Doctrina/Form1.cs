@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Doctrina.eEgg;
+using Doctrina.Enums;
 
 namespace Doctrina
 {
@@ -16,6 +17,7 @@ namespace Doctrina
         private const string ColunmNameFileName = "Имя файла";
         private const string ColunmNameRepeat = "Повторы";
         private const string ColunmNamelPrintTime = "Время последней печати";
+        private const string ColunmNamelCheckFile = "Выбрать файл для печати";
         internal const string FileNameListText = "FileList.csv";
         private const string ConfigIniFileName = "config.ini";
         private const string DateThenAllowPrintPickerString = "Data=";
@@ -23,6 +25,8 @@ namespace Doctrina
         private const string MaxQuestionOnListString = "MaxQuestionOnList=";
         private const string MaxQuestionRepeatString = "MaxQuestionRepeat=";
         private const string BannedSymbolsString = "BannedSymbols=";
+        private WorkLikeEnum currentWorkEnum=WorkLikeEnum.OnlyGenerator;
+
         internal BannedSymbolsClass NewBannedSymbols1;
 
 
@@ -450,6 +454,42 @@ namespace Doctrina
             MyDt.Columns.Add(columnLastPrint);
             datagridForDataTable.DataSource = MyDt;
         }
+        private void CreateDtWithCB()
+        {
+            MyDt = new DataTable();
+            Type typeString = Type.GetType("System.String");
+            Type typeUint = Type.GetType("System.UInt32");
+            Type typeDateTime = Type.GetType("System.DateTime");
+            Type typeBool = Type.GetType("System.Boolean");
+            DataColumn columnFileName = new DataColumn(ColunmNameFileName, typeString);
+            DataColumn columnRepeat = new DataColumn(ColunmNameRepeat, typeUint);
+            DataColumn columnLastPrint = new DataColumn(ColunmNamelPrintTime, typeDateTime);
+            DataColumn columnCheckBool = new DataColumn(ColunmNamelCheckFile,typeBool);
+            columnFileName.ReadOnly = true;
+            columnLastPrint.ReadOnly = true;
+            columnRepeat.ReadOnly = false;
+            columnCheckBool.ReadOnly = false;
+            MyDt.Columns.Add(columnFileName);
+            MyDt.Columns.Add(columnRepeat);
+            MyDt.Columns.Add(columnLastPrint);
+            MyDt.Columns.Add(columnCheckBool);
+            datagridForDataTable.DataSource = MyDt;
+        }
+        /// <summary>
+        /// Пересоздать таблицу при смене режима работы
+        /// </summary>
+        private void ReCreateDT()
+        {
+            if (currentWorkEnum == WorkLikeEnum.GeneratorAndConst)
+            {
+                CreateDtWithCB();
+            }
+            else
+            {
+                CreateDt();
+            }
+            ReloadData();
+        }
 
         private void addRowToDT(string fileName, uint repeat, DateTime lPrintTime)
         {
@@ -457,6 +497,10 @@ namespace Doctrina
             row[ColunmNameFileName] = fileName;
             row[ColunmNameRepeat] = repeat;
             row[ColunmNamelPrintTime] = lPrintTime;
+            if (currentWorkEnum == WorkLikeEnum.GeneratorAndConst)
+            {
+                row[ColunmNamelCheckFile] = false;
+            }
             MyDt.Rows.Add(row);
         }
 
@@ -465,9 +509,16 @@ namespace Doctrina
             CreateDt();
         }
 
+        //TODO:Переделать механизм - постоянно передергивает. Предложить сохранять?
         private void datagridForDataTable_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            BindingContext[(DataTable) datagridForDataTable.DataSource].EndCurrentEdit();
+            
+            if (currentWorkEnum == WorkLikeEnum.GeneratorAndConst)
+            {
+                return;
+            }
+
+            BindingContext[(DataTable)datagridForDataTable.DataSource].EndCurrentEdit();
             var tempDT = ((DataTable) datagridForDataTable.DataSource).GetChanges();
             if (tempDT != null)
             {
@@ -482,6 +533,33 @@ namespace Doctrina
                 SaveDtToFile(ChooseFolderPath);
                 SaveInit();
                 ReloadData();
+            }
+        }
+
+        private void datagridForDataTable_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+            if (currentWorkEnum == WorkLikeEnum.GeneratorAndConst)
+            {
+                if(MyDt.Columns[ColunmNamelCheckFile]!=MyDt.Columns[e.ColumnIndex])
+                    return;
+                var tempDT1 = ((DataTable)datagridForDataTable.DataSource).GetChanges();
+                if (tempDT1 != null)
+                {
+                    var CheckColumn = MyDt.Columns[ColunmNamelCheckFile];
+                    int t = 0;
+                    foreach (DataRow row in MyDt.Rows)
+                    {
+                        var columnIsChecked = (bool)row[CheckColumn];
+                        if (columnIsChecked)
+                            ++t;
+                        if (t >= 2)
+                        {
+                            MessageBox.Show("Превышено допустимое число выбранных вручную вопросов");
+                            MyDt.Rows[e.RowIndex][e.ColumnIndex] = false;
+                            break;
+                        }
+                    }
+                }
             }
         }
 
@@ -882,5 +960,52 @@ namespace Doctrina
         {
             colorTable();
         }
+
+        private void OnlyGeneratorRadioButon_CheckedChanged(object sender, EventArgs e)
+        {
+            if (OnlyGeneratorRadioButon.Checked)
+            {
+                WorkLikeChanged(WorkLikeEnum.OnlyGenerator);
+            }
+        }
+
+        
+
+        private void GeneratorAndConstRadioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (GeneratorAndConstRadioButton.Checked)
+            {
+                WorkLikeChanged(WorkLikeEnum.GeneratorAndConst);
+            }
+        }
+        private void WorkLikeChanged(WorkLikeEnum howNow)
+        {
+            switch (howNow)
+            {
+                case WorkLikeEnum.OnlyGenerator:
+                    {
+                        currentWorkEnum = howNow;
+                        GeneratorAndConstRadioButton.Checked = false;
+                        ReCreateDT();
+                        break;
+                    }
+
+                case WorkLikeEnum.GeneratorAndConst:
+                    {
+                        currentWorkEnum = howNow;
+                        OnlyGeneratorRadioButon.Checked = false;
+                        ReCreateDT();
+                        break;
+                    }
+                case WorkLikeEnum.GeneratorAndLST:
+                    {
+                        currentWorkEnum = howNow;
+                        ReCreateDT();
+                        break;
+                    }
+            }
+        }
+
+
     }
 }
