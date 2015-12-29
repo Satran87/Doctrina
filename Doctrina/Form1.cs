@@ -25,7 +25,9 @@ namespace Doctrina
         private const string MaxQuestionOnListString = "MaxQuestionOnList=";
         private const string MaxQuestionRepeatString = "MaxQuestionRepeat=";
         private const string BannedSymbolsString = "BannedSymbols=";
-        public WorkLikeEnum currentWorkEnum=WorkLikeEnum.OnlyGenerator;
+        public WorkLikeEnum CurrentWorkEnum=WorkLikeEnum.OnlyGenerator;
+
+        private List<int>CheckedIndex=new List<int>(); 
 
         public int NumberOfConstFiles = 0;
 
@@ -235,6 +237,7 @@ namespace Doctrina
             }
             if (dlgResult == DialogResult.OK)
             {
+                CheckedIndex.Clear();
                 ChooseFolderPath = folderDialog.SelectedPath;
                 currentFolderTextBox.Text = ChooseFolderPath;
                 RunButton.Enabled = true;
@@ -370,6 +373,14 @@ namespace Doctrina
             {
                 addRowToDT(block.ShortFileName, block.TimeRepeated, block.LastTimePrint);
             }
+            if (CurrentWorkEnum==WorkLikeEnum.GeneratorAndConst)
+            {
+                var checkedColumn = MyDt.Columns[ColunmNamelCheckFile];
+                foreach (var index in CheckedIndex)
+                {
+                    MyDt.Rows[index][checkedColumn] = true;
+                }
+            }
             colorTable();
         }
 
@@ -420,7 +431,7 @@ namespace Doctrina
 
         private void GetBlocks(ref List<List<DoneBlock>> allQuestions)
         {
-            switch (currentWorkEnum)
+            switch (CurrentWorkEnum)
             {
                 case WorkLikeEnum.OnlyGenerator:
                 {
@@ -453,17 +464,17 @@ namespace Doctrina
         private List<DoneBlock> PrepareNewDoneBlockForallQuestion(ref List <DoneBlock> doneBlocksWithoutConst)
         {
             var CheckColumn = MyDt.Columns[ColunmNamelCheckFile];
-            List<int> checkedIndex = new List<int>();
+            CheckedIndex = new List<int>();
             int t = 0;
             foreach (DataRow row in MyDt.Rows)
             {
                 var columnIsChecked = (bool) row[CheckColumn];
                 if (columnIsChecked)
-                    checkedIndex.Add(t);
+                    CheckedIndex.Add(t);
                 ++t;
             }
             List<DoneBlock> constBlocks = new List<DoneBlock>();
-            foreach (var index in checkedIndex)
+            foreach (var index in CheckedIndex)
             {
                 constBlocks.Add(DoneBlocks[index]);
             }
@@ -533,7 +544,7 @@ namespace Doctrina
         /// </summary>
         private void ReCreateDT()
         {
-            if (currentWorkEnum == WorkLikeEnum.GeneratorAndConst)
+            if (CurrentWorkEnum == WorkLikeEnum.GeneratorAndConst)
             {
                 CreateDtWithCB();
             }
@@ -550,7 +561,7 @@ namespace Doctrina
             row[ColunmNameFileName] = fileName;
             row[ColunmNameRepeat] = repeat;
             row[ColunmNamelPrintTime] = lPrintTime;
-            if (currentWorkEnum == WorkLikeEnum.GeneratorAndConst)
+            if (CurrentWorkEnum == WorkLikeEnum.GeneratorAndConst)
             {
                 row[ColunmNamelCheckFile] = false;
             }
@@ -565,55 +576,71 @@ namespace Doctrina
         //TODO:Переделать механизм - постоянно передергивает. Предложить сохранять?
         private void datagridForDataTable_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            
-            if (currentWorkEnum == WorkLikeEnum.GeneratorAndConst)
+            if (CurrentWorkEnum == WorkLikeEnum.GeneratorAndConst)
             {
-                return;
-            }
+                //if (MyDt.Columns[ColunmNamelCheckFile] != MyDt.Columns[e.ColumnIndex])
+                //    return;
 
-            BindingContext[(DataTable)datagridForDataTable.DataSource].EndCurrentEdit();
-            var tempDT = ((DataTable) datagridForDataTable.DataSource).GetChanges();
-            if (tempDT != null)
-            {
-                MyDt.Clear();
-                MyDt = tempDT;
-                ((DataTable) datagridForDataTable.DataSource).AcceptChanges();
+                //var CheckColumn = MyDt.Columns[ColunmNamelCheckFile];
+                //int t = 0;
+                //foreach (DataRow row in MyDt.Rows)
+                //{
+                //    var columnIsChecked = (bool) row[CheckColumn];
+                //    if (columnIsChecked)
+                //        ++t;
+                //    if (t == 3)
+                //    {
+                //        MessageBox.Show("Превышено допустимое число выбранных вручную вопросов");
+                //        // MyDt.Rows[e.RowIndex][e.ColumnIndex] = false;
+                //        MyDt.RejectChanges();
+                //        return;
+                //    }
+                //}
+                //MyDt.AcceptChanges();
+                //((DataTable) datagridForDataTable.DataSource).AcceptChanges();
             }
-            datagridForDataTable.DataSource = MyDt;
-            colorTable();
-            if (!string.IsNullOrEmpty(ChooseFolderPath))
+            else
             {
-                SaveDtToFile(ChooseFolderPath);
-                SaveInit();
-                ReloadData();
+                BindingContext[(DataTable) datagridForDataTable.DataSource].EndCurrentEdit();
+                var tempDT = ((DataTable) datagridForDataTable.DataSource).GetChanges();
+                if (tempDT != null)
+                {
+                    MyDt.Clear();
+                    MyDt = tempDT;
+                    ((DataTable) datagridForDataTable.DataSource).AcceptChanges();
+                }
+                datagridForDataTable.DataSource = MyDt;
+                colorTable();
+                if (!string.IsNullOrEmpty(ChooseFolderPath))
+                {
+                    SaveDtToFile(ChooseFolderPath);
+                    SaveInit();
+                    ReloadData();
+                }
             }
         }
 
         private void datagridForDataTable_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
-            //if (currentWorkEnum == WorkLikeEnum.GeneratorAndConst)
-            //{
-            //    if(MyDt.Columns[ColunmNamelCheckFile]!=MyDt.Columns[e.ColumnIndex])
-            //        return;
-            //    var tempDT1 = ((DataTable)datagridForDataTable.DataSource).GetChanges();
-            //    if (tempDT1 != null)
-            //    {
-            //        var CheckColumn = MyDt.Columns[ColunmNamelCheckFile];
-            //        int t = 0;
-            //        foreach (DataRow row in MyDt.Rows)
-            //        {
-            //            var columnIsChecked = (bool)row[CheckColumn];
-            //            if (columnIsChecked)
-            //                ++t;
-            //            if (t >= 2)
-            //            {
-            //                MessageBox.Show("Превышено допустимое число выбранных вручную вопросов");
-            //                MyDt.Rows[e.RowIndex][e.ColumnIndex] = false;
-            //                break;
-            //            }
-            //        }
-            //    }
-            //}
+            if (CurrentWorkEnum == WorkLikeEnum.GeneratorAndConst)
+            {
+                //if (MyDt.Columns[ColunmNamelCheckFile] != MyDt.Columns[e.ColumnIndex])
+                //    return;
+                //    var CheckColumn = MyDt.Columns[ColunmNamelCheckFile];
+                //    int t = 0;
+                //    foreach (DataRow row in MyDt.Rows)
+                //    {
+                //        var columnIsChecked = (bool)row[CheckColumn];
+                //        if (columnIsChecked)
+                //            ++t;
+                //        if (t >= 3)
+                //        {
+                //            MessageBox.Show("Превышено допустимое число выбранных вручную вопросов");
+                //            e.Cancel = true;
+                //            break;
+                //        }
+                //    }
+            }
         }
 
         private void SaveDtToFile(string folderPath)
@@ -1037,7 +1064,7 @@ namespace Doctrina
             {
                 case WorkLikeEnum.OnlyGenerator:
                     {
-                        currentWorkEnum = howNow;
+                        CurrentWorkEnum = howNow;
                         GeneratorAndConstRadioButton.Checked = false;
                         ReCreateDT();
                         break;
@@ -1045,20 +1072,48 @@ namespace Doctrina
 
                 case WorkLikeEnum.GeneratorAndConst:
                     {
-                        currentWorkEnum = howNow;
+                        CurrentWorkEnum = howNow;
                         OnlyGeneratorRadioButon.Checked = false;
                         ReCreateDT();
                         break;
                     }
                 case WorkLikeEnum.GeneratorAndLST:
                     {
-                        currentWorkEnum = howNow;
+                        CurrentWorkEnum = howNow;
                         ReCreateDT();
                         break;
                     }
             }
         }
 
-
+        private void datagridForDataTable_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            //if (currentWorkEnum == WorkLikeEnum.GeneratorAndConst)
+            //{
+            //    if (MyDt.Columns[ColunmNamelCheckFile] != MyDt.Columns[e.ColumnIndex])
+            //        return;
+            //    var tempDT1 = ((DataTable) datagridForDataTable.DataSource).GetChanges();
+            //    if (tempDT1 != null)
+            //    {
+            //        var CheckColumn = MyDt.Columns[ColunmNamelCheckFile];
+            //        int t = 0;
+            //        foreach (DataRow row in MyDt.Rows)
+            //        {
+            //            var columnIsChecked = (bool) row[CheckColumn];
+            //            if (columnIsChecked)
+            //                ++t;
+            //            if (t == 3)
+            //            {
+            //                MessageBox.Show("Превышено допустимое число выбранных вручную вопросов");
+            //                // MyDt.Rows[e.RowIndex][e.ColumnIndex] = false;
+            //                MyDt.RejectChanges();
+            //                return;
+            //            }
+            //        }
+            //        MyDt.AcceptChanges();
+            //        ((DataTable) datagridForDataTable.DataSource).AcceptChanges();
+            //    }
+            //}
+        }
     }
 }

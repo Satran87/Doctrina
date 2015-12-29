@@ -179,6 +179,7 @@
             this.datagridForDataTable.TabIndex = 12;
             this.datagridForDataTable.CellBeginEdit += new System.Windows.Forms.DataGridViewCellCancelEventHandler(this.datagridForDataTable_CellBeginEdit);
             this.datagridForDataTable.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.datagridForDataTable_CellEndEdit);
+            this.datagridForDataTable.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.datagridForDataTable_CellValueChanged);
             this.datagridForDataTable.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.datagridForDataTable_ColumnHeaderMouseClick);
             this.datagridForDataTable.ColumnHeaderMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.datagridForDataTable_ColumnHeaderMouseDoubleClick);
             this.datagridForDataTable.DataError += new System.Windows.Forms.DataGridViewDataErrorEventHandler(this.datagridForDataTable_DataError);

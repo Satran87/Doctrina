@@ -91,7 +91,7 @@ namespace Doctrina
             var currentTimeStamp = DateTime.Now - timeAllowPrint;
             var checkdT = _lastPrintTime.Add(currentTimeStamp);
             
-            if (_myForm.currentWorkEnum !=WorkLikeEnum.OnlyGenerator || (_timeRepeat < maxRepeat || checkdT >= timeAllowPrint))
+            if (_myForm.CurrentWorkEnum !=WorkLikeEnum.OnlyGenerator || (_timeRepeat < maxRepeat || checkdT >= timeAllowPrint))
             {
                 if (checkdT >= timeAllowPrint && _timeRepeat >= maxRepeat)
                 {
