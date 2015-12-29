@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using Doctrina.Enums;
 
 namespace Doctrina
 {
@@ -34,6 +36,7 @@ namespace Doctrina
         public uint TimeRepeated
         {
             get { return _timeRepeat; }
+            set { _timeRepeat = value; }
         }
 
         public string ShortAnswerPath
@@ -87,7 +90,8 @@ namespace Doctrina
         {
             var currentTimeStamp = DateTime.Now - timeAllowPrint;
             var checkdT = _lastPrintTime.Add(currentTimeStamp);
-            if (_timeRepeat < maxRepeat || checkdT >= timeAllowPrint)
+            
+            if (_myForm.currentWorkEnum !=WorkLikeEnum.OnlyGenerator || (_timeRepeat < maxRepeat || checkdT >= timeAllowPrint))
             {
                 if (checkdT >= timeAllowPrint && _timeRepeat >= maxRepeat)
                 {

@@ -22,13 +22,13 @@ namespace Doctrina
             return false;
         }
 
-        internal static bool GetBlocks_1(Form1 form1, ref List<DoneBlock> randBlockCopy, ref List<List<DoneBlock>> allQuestions)
+        internal static bool GetBlocks_1(Form1 form1, ref List<DoneBlock> randBlockCopy, ref List<List<DoneBlock>> allQuestions,List<DoneBlock> constBlocks=null )
         {
             uint someTimer = 0;
             for (int listNumber = 0; listNumber < form1.MaxLists;)
             {
-                List<DoneBlock> uniqueQuestion = new List<DoneBlock>();
-                for (int questions = 0; questions < form1.MaxQuestionOnListUint;)
+                var uniqueQuestion = constBlocks == null ? new List<DoneBlock>() : new List<DoneBlock>(constBlocks);
+                for (int questions = 0; questions < form1.MaxQuestionOnListUint-form1.NumberOfConstFiles;)
                 {
                     var randBlock = RandomNumber.Between(0, randBlockCopy.Count - 1);
                     if (!uniqueQuestion.Contains(randBlockCopy[randBlock]))

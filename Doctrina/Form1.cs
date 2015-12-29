@@ -25,7 +25,9 @@ namespace Doctrina
         private const string MaxQuestionOnListString = "MaxQuestionOnList=";
         private const string MaxQuestionRepeatString = "MaxQuestionRepeat=";
         private const string BannedSymbolsString = "BannedSymbols=";
-        private WorkLikeEnum currentWorkEnum=WorkLikeEnum.OnlyGenerator;
+        public WorkLikeEnum currentWorkEnum=WorkLikeEnum.OnlyGenerator;
+
+        public int NumberOfConstFiles = 0;
 
         internal BannedSymbolsClass NewBannedSymbols1;
 
@@ -89,7 +91,7 @@ namespace Doctrina
         internal DataTable MyDt;
         internal string ChooseFolderPath = null;
         /// <summary>
-        /// Готовый комплект вопросов
+        /// Готовый комплект вопросов загруженный из файла
         /// </summary>
         internal List<DoneBlock> DoneBlocks = new List<DoneBlock>();
         /// <summary>
@@ -418,9 +420,60 @@ namespace Doctrina
 
         private void GetBlocks(ref List<List<DoneBlock>> allQuestions)
         {
-            CheckClass.GetBlocks_1(this, ref DoneBlocks, ref allQuestions);
+            switch (currentWorkEnum)
+            {
+                case WorkLikeEnum.OnlyGenerator:
+                {
+                    CheckClass.GetBlocks_1(this, ref DoneBlocks, ref allQuestions);
+                    break;
+                }
+                case WorkLikeEnum.GeneratorAndConst:
+                {
+                    List<DoneBlock> copyedDoneBlocksWihoutCosnt = null;
+                    List<DoneBlock> constBlocks =
+                        new List<DoneBlock>(PrepareNewDoneBlockForallQuestion(ref copyedDoneBlocksWihoutCosnt));
+
+                    NumberOfConstFiles = constBlocks.Count();
+                    CheckClass.GetBlocks_1(this, ref copyedDoneBlocksWihoutCosnt, ref allQuestions, constBlocks);
+
+                    foreach (var constBlock in constBlocks)
+                    {
+                        constBlock.TimeRepeated = MaxLists;
+                        constBlock.LastTimePrint = DateTime.Now;
+                    }
+                    break;
+                }
+                case WorkLikeEnum.GeneratorAndLST:
+                {
+                    break;
+                }
+            }
         }
 
+        private List<DoneBlock> PrepareNewDoneBlockForallQuestion(ref List <DoneBlock> doneBlocksWithoutConst)
+        {
+            var CheckColumn = MyDt.Columns[ColunmNamelCheckFile];
+            List<int> checkedIndex = new List<int>();
+            int t = 0;
+            foreach (DataRow row in MyDt.Rows)
+            {
+                var columnIsChecked = (bool) row[CheckColumn];
+                if (columnIsChecked)
+                    checkedIndex.Add(t);
+                ++t;
+            }
+            List<DoneBlock> constBlocks = new List<DoneBlock>();
+            foreach (var index in checkedIndex)
+            {
+                constBlocks.Add(DoneBlocks[index]);
+            }
+            doneBlocksWithoutConst = new List<DoneBlock>(DoneBlocks);
+            foreach (var block in constBlocks)
+            {
+                doneBlocksWithoutConst.Remove(block);
+            }
+            return constBlocks;
+        }
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             _wordHlp.CloseWord();
@@ -538,29 +591,29 @@ namespace Doctrina
 
         private void datagridForDataTable_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
-            if (currentWorkEnum == WorkLikeEnum.GeneratorAndConst)
-            {
-                if(MyDt.Columns[ColunmNamelCheckFile]!=MyDt.Columns[e.ColumnIndex])
-                    return;
-                var tempDT1 = ((DataTable)datagridForDataTable.DataSource).GetChanges();
-                if (tempDT1 != null)
-                {
-                    var CheckColumn = MyDt.Columns[ColunmNamelCheckFile];
-                    int t = 0;
-                    foreach (DataRow row in MyDt.Rows)
-                    {
-                        var columnIsChecked = (bool)row[CheckColumn];
-                        if (columnIsChecked)
-                            ++t;
-                        if (t >= 2)
-                        {
-                            MessageBox.Show("Превышено допустимое число выбранных вручную вопросов");
-                            MyDt.Rows[e.RowIndex][e.ColumnIndex] = false;
-                            break;
-                        }
-                    }
-                }
-            }
+            //if (currentWorkEnum == WorkLikeEnum.GeneratorAndConst)
+            //{
+            //    if(MyDt.Columns[ColunmNamelCheckFile]!=MyDt.Columns[e.ColumnIndex])
+            //        return;
+            //    var tempDT1 = ((DataTable)datagridForDataTable.DataSource).GetChanges();
+            //    if (tempDT1 != null)
+            //    {
+            //        var CheckColumn = MyDt.Columns[ColunmNamelCheckFile];
+            //        int t = 0;
+            //        foreach (DataRow row in MyDt.Rows)
+            //        {
+            //            var columnIsChecked = (bool)row[CheckColumn];
+            //            if (columnIsChecked)
+            //                ++t;
+            //            if (t >= 2)
+            //            {
+            //                MessageBox.Show("Превышено допустимое число выбранных вручную вопросов");
+            //                MyDt.Rows[e.RowIndex][e.ColumnIndex] = false;
+            //                break;
+            //            }
+            //        }
+            //    }
+            //}
         }
 
         private void SaveDtToFile(string folderPath)
