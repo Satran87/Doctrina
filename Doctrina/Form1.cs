@@ -578,26 +578,25 @@ namespace Doctrina
         {
             if (CurrentWorkEnum == WorkLikeEnum.GeneratorAndConst)
             {
-                //if (MyDt.Columns[ColunmNamelCheckFile] != MyDt.Columns[e.ColumnIndex])
-                //    return;
-
-                //var CheckColumn = MyDt.Columns[ColunmNamelCheckFile];
-                //int t = 0;
-                //foreach (DataRow row in MyDt.Rows)
-                //{
-                //    var columnIsChecked = (bool) row[CheckColumn];
-                //    if (columnIsChecked)
-                //        ++t;
-                //    if (t == 3)
-                //    {
-                //        MessageBox.Show("Превышено допустимое число выбранных вручную вопросов");
-                //        // MyDt.Rows[e.RowIndex][e.ColumnIndex] = false;
-                //        MyDt.RejectChanges();
-                //        return;
-                //    }
-                //}
-                //MyDt.AcceptChanges();
-                //((DataTable) datagridForDataTable.DataSource).AcceptChanges();
+                if (MyDt.Columns[ColunmNamelCheckFile] != MyDt.Columns[e.ColumnIndex])
+                    return;
+                bool test=(bool)datagridForDataTable[e.ColumnIndex, e.RowIndex].Value;
+                var CheckColumn = MyDt.Columns[ColunmNamelCheckFile];
+                int t = 0;
+                foreach (DataRow row in MyDt.Rows)
+                {
+                    var columnIsChecked = (bool)row[CheckColumn];
+                    if (columnIsChecked)
+                        ++t;
+                    if (t == 3)
+                    {
+                        MessageBox.Show("Превышено допустимое число выбранных вручную вопросов");
+                         MyDt.Rows[e.RowIndex][e.ColumnIndex] = false;
+                        return;
+                    }
+                }
+                MyDt.AcceptChanges();
+                ((DataTable)datagridForDataTable.DataSource).AcceptChanges();
             }
             else
             {
@@ -617,29 +616,6 @@ namespace Doctrina
                     SaveInit();
                     ReloadData();
                 }
-            }
-        }
-
-        private void datagridForDataTable_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
-        {
-            if (CurrentWorkEnum == WorkLikeEnum.GeneratorAndConst)
-            {
-                //if (MyDt.Columns[ColunmNamelCheckFile] != MyDt.Columns[e.ColumnIndex])
-                //    return;
-                //    var CheckColumn = MyDt.Columns[ColunmNamelCheckFile];
-                //    int t = 0;
-                //    foreach (DataRow row in MyDt.Rows)
-                //    {
-                //        var columnIsChecked = (bool)row[CheckColumn];
-                //        if (columnIsChecked)
-                //            ++t;
-                //        if (t >= 3)
-                //        {
-                //            MessageBox.Show("Превышено допустимое число выбранных вручную вопросов");
-                //            e.Cancel = true;
-                //            break;
-                //        }
-                //    }
             }
         }
 
@@ -1084,36 +1060,6 @@ namespace Doctrina
                         break;
                     }
             }
-        }
-
-        private void datagridForDataTable_CellValueChanged(object sender, DataGridViewCellEventArgs e)
-        {
-            //if (currentWorkEnum == WorkLikeEnum.GeneratorAndConst)
-            //{
-            //    if (MyDt.Columns[ColunmNamelCheckFile] != MyDt.Columns[e.ColumnIndex])
-            //        return;
-            //    var tempDT1 = ((DataTable) datagridForDataTable.DataSource).GetChanges();
-            //    if (tempDT1 != null)
-            //    {
-            //        var CheckColumn = MyDt.Columns[ColunmNamelCheckFile];
-            //        int t = 0;
-            //        foreach (DataRow row in MyDt.Rows)
-            //        {
-            //            var columnIsChecked = (bool) row[CheckColumn];
-            //            if (columnIsChecked)
-            //                ++t;
-            //            if (t == 3)
-            //            {
-            //                MessageBox.Show("Превышено допустимое число выбранных вручную вопросов");
-            //                // MyDt.Rows[e.RowIndex][e.ColumnIndex] = false;
-            //                MyDt.RejectChanges();
-            //                return;
-            //            }
-            //        }
-            //        MyDt.AcceptChanges();
-            //        ((DataTable) datagridForDataTable.DataSource).AcceptChanges();
-            //    }
-            //}
         }
     }
 }
