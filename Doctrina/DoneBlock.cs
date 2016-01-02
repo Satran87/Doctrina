@@ -43,7 +43,6 @@ namespace Doctrina
         {
             get { return Path.GetFileNameWithoutExtension(_answerPath); }
         }
-
         public string AnswerFolder
         {
             get

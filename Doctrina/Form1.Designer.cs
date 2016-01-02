@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.folderDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.chooseFolderButton = new System.Windows.Forms.Button();
             this.MaxQuestionOnListText = new System.Windows.Forms.TextBox();
@@ -56,13 +56,20 @@
             this.backgroundWorker2 = new System.ComponentModel.BackgroundWorker();
             this.OnlyGeneratorRadioButon = new System.Windows.Forms.RadioButton();
             this.GeneratorAndConstRadioButton = new System.Windows.Forms.RadioButton();
+            this.GeneratorAndLSTradioButton = new System.Windows.Forms.RadioButton();
+            this.EasytextBox = new System.Windows.Forms.TextBox();
+            this.MiddletextBox = new System.Windows.Forms.TextBox();
+            this.HardtextBox = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.datagridForDataTable)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // chooseFolderButton
             // 
-            this.chooseFolderButton.Location = new System.Drawing.Point(25, 330);
+            this.chooseFolderButton.Location = new System.Drawing.Point(26, 406);
             this.chooseFolderButton.Name = "chooseFolderButton";
             this.chooseFolderButton.Size = new System.Drawing.Size(91, 23);
             this.chooseFolderButton.TabIndex = 0;
@@ -93,7 +100,7 @@
             // RunButton
             // 
             this.RunButton.Enabled = false;
-            this.RunButton.Location = new System.Drawing.Point(148, 330);
+            this.RunButton.Location = new System.Drawing.Point(149, 406);
             this.RunButton.Name = "RunButton";
             this.RunButton.Size = new System.Drawing.Size(75, 23);
             this.RunButton.TabIndex = 5;
@@ -140,7 +147,7 @@
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(9, 301);
+            this.progressBar1.Location = new System.Drawing.Point(10, 377);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(340, 23);
             this.progressBar1.TabIndex = 10;
@@ -161,14 +168,14 @@
             this.datagridForDataTable.AllowUserToResizeColumns = false;
             this.datagridForDataTable.AllowUserToResizeRows = false;
             this.datagridForDataTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.datagridForDataTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.datagridForDataTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this.datagridForDataTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.datagridForDataTable.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnKeystroke;
             this.datagridForDataTable.Location = new System.Drawing.Point(355, 12);
@@ -214,7 +221,7 @@
             this.groupBox1.Controls.Add(this.allCheckBox);
             this.groupBox1.Controls.Add(this.questionCheckBox);
             this.groupBox1.Controls.Add(this.answerCheckBox);
-            this.groupBox1.Location = new System.Drawing.Point(12, 159);
+            this.groupBox1.Location = new System.Drawing.Point(13, 235);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(200, 100);
             this.groupBox1.TabIndex = 16;
@@ -262,7 +269,7 @@
             // 
             // currentStatusTextBox
             // 
-            this.currentStatusTextBox.Location = new System.Drawing.Point(9, 275);
+            this.currentStatusTextBox.Location = new System.Drawing.Point(10, 351);
             this.currentStatusTextBox.Name = "currentStatusTextBox";
             this.currentStatusTextBox.ReadOnly = true;
             this.currentStatusTextBox.Size = new System.Drawing.Size(340, 20);
@@ -271,7 +278,7 @@
             // 
             // cancelButton
             // 
-            this.cancelButton.Location = new System.Drawing.Point(247, 330);
+            this.cancelButton.Location = new System.Drawing.Point(248, 406);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 23);
             this.cancelButton.TabIndex = 18;
@@ -282,7 +289,7 @@
             // 
             // PrintLastButton
             // 
-            this.PrintLastButton.Location = new System.Drawing.Point(235, 194);
+            this.PrintLastButton.Location = new System.Drawing.Point(236, 270);
             this.PrintLastButton.Name = "PrintLastButton";
             this.PrintLastButton.Size = new System.Drawing.Size(75, 38);
             this.PrintLastButton.TabIndex = 19;
@@ -300,7 +307,7 @@
             // 
             this.OnlyGeneratorRadioButon.AutoSize = true;
             this.OnlyGeneratorRadioButon.Checked = true;
-            this.OnlyGeneratorRadioButon.Location = new System.Drawing.Point(25, 381);
+            this.OnlyGeneratorRadioButon.Location = new System.Drawing.Point(17, 439);
             this.OnlyGeneratorRadioButon.Name = "OnlyGeneratorRadioButon";
             this.OnlyGeneratorRadioButon.Size = new System.Drawing.Size(129, 17);
             this.OnlyGeneratorRadioButon.TabIndex = 20;
@@ -312,7 +319,7 @@
             // GeneratorAndConstRadioButton
             // 
             this.GeneratorAndConstRadioButton.AutoSize = true;
-            this.GeneratorAndConstRadioButton.Location = new System.Drawing.Point(164, 381);
+            this.GeneratorAndConstRadioButton.Location = new System.Drawing.Point(156, 439);
             this.GeneratorAndConstRadioButton.Name = "GeneratorAndConstRadioButton";
             this.GeneratorAndConstRadioButton.Size = new System.Drawing.Size(193, 17);
             this.GeneratorAndConstRadioButton.TabIndex = 21;
@@ -320,11 +327,84 @@
             this.GeneratorAndConstRadioButton.UseVisualStyleBackColor = true;
             this.GeneratorAndConstRadioButton.CheckedChanged += new System.EventHandler(this.GeneratorAndConstRadioButton_CheckedChanged);
             // 
+            // GeneratorAndLSTradioButton
+            // 
+            this.GeneratorAndLSTradioButton.AutoSize = true;
+            this.GeneratorAndLSTradioButton.Location = new System.Drawing.Point(370, 439);
+            this.GeneratorAndLSTradioButton.Name = "GeneratorAndLSTradioButton";
+            this.GeneratorAndLSTradioButton.Size = new System.Drawing.Size(163, 17);
+            this.GeneratorAndLSTradioButton.TabIndex = 22;
+            this.GeneratorAndLSTradioButton.TabStop = true;
+            this.GeneratorAndLSTradioButton.Text = "Стандартный режим + ЛСТ";
+            this.GeneratorAndLSTradioButton.UseVisualStyleBackColor = true;
+            this.GeneratorAndLSTradioButton.CheckedChanged += new System.EventHandler(this.GeneratorAndLSTradioButton_CheckedChanged);
+            // 
+            // EasytextBox
+            // 
+            this.EasytextBox.Location = new System.Drawing.Point(193, 163);
+            this.EasytextBox.Name = "EasytextBox";
+            this.EasytextBox.Size = new System.Drawing.Size(100, 20);
+            this.EasytextBox.TabIndex = 23;
+            this.EasytextBox.Text = "0";
+            this.EasytextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.EasytextBox_KeyPress);
+            // 
+            // MiddletextBox
+            // 
+            this.MiddletextBox.Location = new System.Drawing.Point(193, 189);
+            this.MiddletextBox.Name = "MiddletextBox";
+            this.MiddletextBox.Size = new System.Drawing.Size(100, 20);
+            this.MiddletextBox.TabIndex = 24;
+            this.MiddletextBox.Text = "0";
+            this.MiddletextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.MiddletextBox_KeyPress);
+            // 
+            // HardtextBox
+            // 
+            this.HardtextBox.Location = new System.Drawing.Point(193, 215);
+            this.HardtextBox.Name = "HardtextBox";
+            this.HardtextBox.Size = new System.Drawing.Size(100, 20);
+            this.HardtextBox.TabIndex = 25;
+            this.HardtextBox.Text = "0";
+            this.HardtextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.HardtextBox_KeyPress);
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(6, 163);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(44, 13);
+            this.label5.TabIndex = 26;
+            this.label5.Text = "Легкий";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(6, 189);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(50, 13);
+            this.label6.TabIndex = 27;
+            this.label6.Text = "Средний";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(6, 215);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(54, 13);
+            this.label7.TabIndex = 28;
+            this.label7.Text = "Тяжелый";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(860, 419);
+            this.ClientSize = new System.Drawing.Size(860, 468);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.HardtextBox);
+            this.Controls.Add(this.MiddletextBox);
+            this.Controls.Add(this.EasytextBox);
+            this.Controls.Add(this.GeneratorAndLSTradioButton);
             this.Controls.Add(this.GeneratorAndConstRadioButton);
             this.Controls.Add(this.OnlyGeneratorRadioButon);
             this.Controls.Add(this.PrintLastButton);
@@ -385,6 +465,13 @@
         private System.ComponentModel.BackgroundWorker backgroundWorker2;
         private System.Windows.Forms.RadioButton OnlyGeneratorRadioButon;
         private System.Windows.Forms.RadioButton GeneratorAndConstRadioButton;
+        private System.Windows.Forms.RadioButton GeneratorAndLSTradioButton;
+        private System.Windows.Forms.TextBox EasytextBox;
+        private System.Windows.Forms.TextBox MiddletextBox;
+        private System.Windows.Forms.TextBox HardtextBox;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
     }
 }
 

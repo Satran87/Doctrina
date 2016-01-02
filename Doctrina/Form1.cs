@@ -25,7 +25,11 @@ namespace Doctrina
         private const string MaxQuestionOnListString = "MaxQuestionOnList=";
         private const string MaxQuestionRepeatString = "MaxQuestionRepeat=";
         private const string BannedSymbolsString = "BannedSymbols=";
+
         public WorkLikeEnum CurrentWorkEnum=WorkLikeEnum.OnlyGenerator;
+        public int LSTEasyNumber = 0;
+        public int LSTMiddleNumber = 0;
+        public int LSTHardNumber = 0;
 
         private List<int>CheckedIndex=new List<int>(); 
 
@@ -110,6 +114,7 @@ namespace Doctrina
             backgroundWorker2.DoWork += BackgroundWorker2_DoWork;
             cancelButton.Enabled = false;
             InitMyComponents();
+            EnableLSTFields(false);
         }
 
 
@@ -395,6 +400,10 @@ namespace Doctrina
                 MaxQuestionOnListUint = Convert.ToUInt32(MaxQuestionOnListText.Text);
                 MaxQuestonRepeatUint = Convert.ToUInt32(MaxQuestionRepeatText.Text);
                 MaxLists = Convert.ToUInt32(NumberOfLists.Text);
+
+                LSTEasyNumber = Convert.ToInt32(EasytextBox.Text);
+                LSTMiddleNumber = Convert.ToInt32(MiddletextBox.Text);
+                LSTHardNumber = Convert.ToInt32(HardtextBox.Text);
             }
             catch (Exception)
             {
@@ -402,8 +411,15 @@ namespace Doctrina
                 return;
             }
 
-
-            if (CheckClass.Cheks(this,currentFolderTextBox.Text)) return;
+            if (CurrentWorkEnum == WorkLikeEnum.GeneratorAndLST)
+            {
+                
+            }
+            else
+            {
+                if (CheckClass.Cheks(this, currentFolderTextBox.Text)) return;
+            }
+            
             timer1.Start();
             progressBar1.Style = ProgressBarStyle.Marquee;
             backgroundWorker1.RunWorkerAsync();     
@@ -455,9 +471,62 @@ namespace Doctrina
                     break;
                 }
                 case WorkLikeEnum.GeneratorAndLST:
-                {
-                    break;
-                }
+                    {
+                        List<DoneBlock> copyDoneBlocks = new List<DoneBlock>(DoneBlocks);
+                        List<DoneBlock> EasyList = new List<DoneBlock>();
+                        List<DoneBlock> MiddleList = new List<DoneBlock>();
+                        List<DoneBlock> HardList = new List<DoneBlock>();
+
+                        List < List < DoneBlock >> EasyDone = new List<List<DoneBlock>>();
+                        List<List<DoneBlock>> MiddleDone = new List<List<DoneBlock>>();
+                        List<List<DoneBlock>> HardDone = new List<List<DoneBlock>>();
+                        bool result = true;
+                        if (LSTEasyNumber + LSTMiddleNumber + LSTHardNumber > MaxQuestionOnListUint)
+                        {
+                            OnErrorHappen("Количество спец вопросов больше, чем всего вопросов на лист");
+                            return;
+                        }
+                        if (LSTEasyNumber > 0)
+                        {
+                            EasyList = PrepareNewDoneBlockForLST(ref copyDoneBlocks, "Л_");
+                            result = CheckClass.GetBlocks_1(this, ref EasyList, ref allQuestions,null,EasyList.Count);
+                            EasyDone.AddRange(allQuestions);
+                            allQuestions.Clear();
+                        }
+                        if (LSTMiddleNumber > 0)
+                        {
+                            MiddleList = PrepareNewDoneBlockForLST(ref copyDoneBlocks, "С_");
+                            result = CheckClass.GetBlocks_1(this, ref MiddleList, ref allQuestions,null,MiddleList.Count);
+                            MiddleDone.AddRange(allQuestions);
+                            allQuestions.Clear();
+                        }
+                        if (LSTHardNumber > 0)
+                        {
+                            HardList = PrepareNewDoneBlockForLST(ref copyDoneBlocks, "Т_");
+                            result = CheckClass.GetBlocks_1(this, ref HardList, ref allQuestions,null,HardList.Count);
+                            HardDone.AddRange(allQuestions);
+                            allQuestions.Clear();
+                        }
+                        result = CheckClass.GetBlocks_1(this, ref copyDoneBlocks, ref allQuestions);
+                        int index = 0;
+                        foreach (var question in allQuestions)
+                        {
+                            if (EasyDone.Count > 0)
+                            {
+                                question.AddRange(EasyDone[index]);
+                            }
+                            if (MiddleDone.Count > 0)
+                            {
+                                question.AddRange(MiddleDone[index]);
+                            }
+                            if (HardDone.Count > 0)
+                            {
+                                question.AddRange(HardDone[index]);
+                            }
+                            ++index;
+                        }
+                        break;
+                    }
             }
         }
 
@@ -485,6 +554,23 @@ namespace Doctrina
             }
             return constBlocks;
         }
+
+        private List<DoneBlock> PrepareNewDoneBlockForLST(ref List<DoneBlock> doneBlocks,string symbolToSeach)
+        {
+            List<DoneBlock> separetedBlocks = new List<DoneBlock>();
+            foreach (var doneblock in doneBlocks)
+            {
+                if(doneblock.ShortFileName.StartsWith(symbolToSeach))
+                    separetedBlocks.Add(doneblock);
+            }
+            foreach (var block in separetedBlocks)
+            {
+                doneBlocks.Remove(block);
+            }
+            return separetedBlocks;
+        }
+
+
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             _wordHlp.CloseWord();
@@ -703,6 +789,10 @@ namespace Doctrina
                 answerCheckBox.Enabled = false;
                 questionCheckBox.Enabled = false;
                 datagridForDataTable.Enabled = false;
+                OnlyGeneratorRadioButon.Enabled = false;
+                GeneratorAndConstRadioButton.Enabled = false;
+                GeneratorAndLSTradioButton.Enabled = false;
+                EnableLSTFields(false);
             }
             else
             {
@@ -717,7 +807,13 @@ namespace Doctrina
                 answerCheckBox.Enabled = true;
                 questionCheckBox.Enabled = true;
                 datagridForDataTable.Enabled = true;
-
+                OnlyGeneratorRadioButon.Enabled = true;
+                GeneratorAndConstRadioButton.Enabled = true;
+                GeneratorAndLSTradioButton.Enabled = true;
+                if (CurrentWorkEnum==WorkLikeEnum.GeneratorAndLST)
+                {
+                    EnableLSTFields(true);
+                }
                 cancelButton.Enabled = false;
                 progressBar1.Style = ProgressBarStyle.Blocks;
                 FillList();
@@ -947,21 +1043,20 @@ namespace Doctrina
 
         private void NumberOfLists_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (!Char.IsDigit(e.KeyChar) && e.KeyChar != Convert.ToChar(8))
-            {
-                e.Handled = true;
-            }
+            CheckIsDigit(e);
         }
 
         private void MaxQuestionOnListText_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (!Char.IsDigit(e.KeyChar) && e.KeyChar != Convert.ToChar(8))
-            {
-                e.Handled = true;
-            }
+            CheckIsDigit(e);
         }
 
         private void MaxQuestionRepeatText_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            CheckIsDigit(e);
+        }
+
+        private static void CheckIsDigit(KeyPressEventArgs e)
         {
             if (!Char.IsDigit(e.KeyChar) && e.KeyChar != Convert.ToChar(8))
             {
@@ -1034,6 +1129,15 @@ namespace Doctrina
                 WorkLikeChanged(WorkLikeEnum.GeneratorAndConst);
             }
         }
+
+        private void GeneratorAndLSTradioButton_CheckedChanged(object sender, EventArgs e)
+        {
+            if (GeneratorAndLSTradioButton.Checked)
+            {
+                WorkLikeChanged(WorkLikeEnum.GeneratorAndLST);
+            }
+
+        }
         private void WorkLikeChanged(WorkLikeEnum howNow)
         {
             switch (howNow)
@@ -1042,6 +1146,8 @@ namespace Doctrina
                     {
                         CurrentWorkEnum = howNow;
                         GeneratorAndConstRadioButton.Checked = false;
+                        GeneratorAndLSTradioButton.Checked = false;
+                        EnableLSTFields(false);
                         ReCreateDT();
                         break;
                     }
@@ -1050,16 +1156,43 @@ namespace Doctrina
                     {
                         CurrentWorkEnum = howNow;
                         OnlyGeneratorRadioButon.Checked = false;
+                        GeneratorAndLSTradioButton.Checked = false;
+                        EnableLSTFields(false);
                         ReCreateDT();
                         break;
                     }
                 case WorkLikeEnum.GeneratorAndLST:
                     {
                         CurrentWorkEnum = howNow;
+                        GeneratorAndConstRadioButton.Checked = false;
+                        GeneratorAndConstRadioButton.Checked = false;
+                        EnableLSTFields(true);
                         ReCreateDT();
                         break;
                     }
             }
         }
+
+        private void EnableLSTFields(bool enable)
+        {
+            EasytextBox.Enabled = enable;
+            MiddletextBox.Enabled = enable;
+            HardtextBox.Enabled = enable;
+        }
+        private void EasytextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            CheckIsDigit(e);
+        }
+
+        private void MiddletextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            CheckIsDigit(e);
+        }
+
+        private void HardtextBox_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            CheckIsDigit(e);
+        }
+
     }
 }
