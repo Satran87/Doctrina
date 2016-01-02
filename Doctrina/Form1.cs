@@ -1194,5 +1194,13 @@ namespace Doctrina
             CheckIsDigit(e);
         }
 
+        private void SaveButton_Click(object sender, EventArgs e)
+        {
+            SaveInit();
+            if (!string.IsNullOrEmpty(ChooseFolderPath))
+            {
+                SaveDtToFile(ChooseFolderPath);
+            }
+        }
     }
 }
