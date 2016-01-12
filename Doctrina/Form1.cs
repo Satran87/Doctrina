@@ -717,7 +717,7 @@ namespace Doctrina
 
                 StringBuilder sb = new StringBuilder();
                 IEnumerable<string> columnNames = MyDt.Columns.Cast<DataColumn>().
-                    Select(column => column.ColumnName);
+                    Select(column => column.ColumnName).Where(column =>column!=ColunmNamelCheckFile);
                 sb.AppendLine(string.Join(";", columnNames));
                 foreach (DataRow row in MyDt.Rows)
                 {
