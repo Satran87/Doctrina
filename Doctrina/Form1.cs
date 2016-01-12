@@ -205,6 +205,7 @@ namespace Doctrina
                 DoneBlocks = CheckClass.CopyDoneBlocks(this,DoneBlocksOldCopy);
                 _wordHlp.CloseWord();
                 _wordHlp.DeleteAllFilesOnTempDirectory();
+                SetTextinThread("");
                 if (OnErrorHappenYesNo("Произошла ошибка \r\n" + e.Message + "\r\nЗакрыть программу?"))
                 {
                     Environment.Exit(0);
@@ -508,6 +509,8 @@ namespace Doctrina
                             allQuestions.Clear();
                         }
                         result = CheckClass.GetBlocks_1(this, ref copyDoneBlocks, ref allQuestions);
+                        if(result)
+                            throw new Exception("Произошла ошибка генерации вопросов");
                         int index = 0;
                         foreach (var question in allQuestions)
                         {

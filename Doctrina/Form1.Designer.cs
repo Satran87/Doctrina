@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.folderDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.chooseFolderButton = new System.Windows.Forms.Button();
             this.MaxQuestionOnListText = new System.Windows.Forms.TextBox();
@@ -169,21 +169,21 @@
             this.datagridForDataTable.AllowUserToResizeColumns = false;
             this.datagridForDataTable.AllowUserToResizeRows = false;
             this.datagridForDataTable.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.datagridForDataTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.datagridForDataTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.datagridForDataTable.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.datagridForDataTable.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnKeystroke;
             this.datagridForDataTable.Location = new System.Drawing.Point(355, 12);
             this.datagridForDataTable.MultiSelect = false;
             this.datagridForDataTable.Name = "datagridForDataTable";
             this.datagridForDataTable.RowHeadersVisible = false;
-            this.datagridForDataTable.Size = new System.Drawing.Size(493, 341);
+            this.datagridForDataTable.Size = new System.Drawing.Size(493, 331);
             this.datagridForDataTable.TabIndex = 12;
             this.datagridForDataTable.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.datagridForDataTable_CellEndEdit);
             this.datagridForDataTable.ColumnHeaderMouseClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.datagridForDataTable_ColumnHeaderMouseClick);
@@ -308,7 +308,7 @@
             // 
             this.OnlyGeneratorRadioButon.AutoSize = true;
             this.OnlyGeneratorRadioButon.Checked = true;
-            this.OnlyGeneratorRadioButon.Location = new System.Drawing.Point(17, 439);
+            this.OnlyGeneratorRadioButon.Location = new System.Drawing.Point(365, 354);
             this.OnlyGeneratorRadioButon.Name = "OnlyGeneratorRadioButon";
             this.OnlyGeneratorRadioButon.Size = new System.Drawing.Size(129, 17);
             this.OnlyGeneratorRadioButon.TabIndex = 20;
@@ -320,7 +320,7 @@
             // GeneratorAndConstRadioButton
             // 
             this.GeneratorAndConstRadioButton.AutoSize = true;
-            this.GeneratorAndConstRadioButton.Location = new System.Drawing.Point(156, 439);
+            this.GeneratorAndConstRadioButton.Location = new System.Drawing.Point(365, 377);
             this.GeneratorAndConstRadioButton.Name = "GeneratorAndConstRadioButton";
             this.GeneratorAndConstRadioButton.Size = new System.Drawing.Size(193, 17);
             this.GeneratorAndConstRadioButton.TabIndex = 21;
@@ -331,7 +331,7 @@
             // GeneratorAndLSTradioButton
             // 
             this.GeneratorAndLSTradioButton.AutoSize = true;
-            this.GeneratorAndLSTradioButton.Location = new System.Drawing.Point(370, 439);
+            this.GeneratorAndLSTradioButton.Location = new System.Drawing.Point(365, 400);
             this.GeneratorAndLSTradioButton.Name = "GeneratorAndLSTradioButton";
             this.GeneratorAndLSTradioButton.Size = new System.Drawing.Size(163, 17);
             this.GeneratorAndLSTradioButton.TabIndex = 22;
@@ -396,11 +396,11 @@
             // 
             // SaveButton
             // 
-            this.SaveButton.Location = new System.Drawing.Point(552, 359);
+            this.SaveButton.Location = new System.Drawing.Point(693, 349);
             this.SaveButton.Name = "SaveButton";
-            this.SaveButton.Size = new System.Drawing.Size(75, 23);
+            this.SaveButton.Size = new System.Drawing.Size(155, 23);
             this.SaveButton.TabIndex = 29;
-            this.SaveButton.Text = "Сохранить";
+            this.SaveButton.Text = "Сохранить таблицу в файл";
             this.SaveButton.UseVisualStyleBackColor = true;
             this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
             // 
@@ -408,7 +408,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(860, 468);
+            this.ClientSize = new System.Drawing.Size(860, 436);
             this.Controls.Add(this.SaveButton);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label6);

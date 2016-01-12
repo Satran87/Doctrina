@@ -46,10 +46,6 @@ namespace Doctrina
                     }
                     case WorkLikeEnum.GeneratorAndLST:
                     {
-                            //maxRepeat = maxQuestionOnList > 0
-                            //    ? maxQuestionOnList
-                            //    : (form1.MaxQuestionOnListUint - form1.LSTEasyNumber -
-                            //       form1.LSTMiddleNumber - form1.LSTHardNumber);
                             maxRepeat = maxQuestionOnList>0 ? maxQuestionOnList : form1.MaxQuestionOnListUint  - form1.LSTEasyNumber -form1.LSTMiddleNumber - form1.LSTHardNumber;
                             break;
                     }
