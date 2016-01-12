@@ -489,21 +489,21 @@ namespace Doctrina
                         if (LSTEasyNumber > 0)
                         {
                             EasyList = PrepareNewDoneBlockForLST(ref copyDoneBlocks, "Л_");
-                            result = CheckClass.GetBlocks_1(this, ref EasyList, ref allQuestions,null,EasyList.Count);
+                            result = CheckClass.GetBlocks_1(this, ref EasyList, ref allQuestions,null, LSTEasyNumber);
                             EasyDone.AddRange(allQuestions);
                             allQuestions.Clear();
                         }
                         if (LSTMiddleNumber > 0)
                         {
                             MiddleList = PrepareNewDoneBlockForLST(ref copyDoneBlocks, "С_");
-                            result = CheckClass.GetBlocks_1(this, ref MiddleList, ref allQuestions,null,MiddleList.Count);
+                            result = CheckClass.GetBlocks_1(this, ref MiddleList, ref allQuestions,null, LSTMiddleNumber);
                             MiddleDone.AddRange(allQuestions);
                             allQuestions.Clear();
                         }
                         if (LSTHardNumber > 0)
                         {
                             HardList = PrepareNewDoneBlockForLST(ref copyDoneBlocks, "Т_");
-                            result = CheckClass.GetBlocks_1(this, ref HardList, ref allQuestions,null,HardList.Count);
+                            result = CheckClass.GetBlocks_1(this, ref HardList, ref allQuestions,null, LSTHardNumber);
                             HardDone.AddRange(allQuestions);
                             allQuestions.Clear();
                         }
