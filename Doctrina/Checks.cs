@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Doctrina.Enums;
 
 namespace Doctrina
 {
@@ -24,11 +25,40 @@ namespace Doctrina
 
         internal static bool GetBlocks_1(Form1 form1, ref List<DoneBlock> randBlockCopy, ref List<List<DoneBlock>> allQuestions,List<DoneBlock> constBlocks=null,int maxQuestionOnList=0 )
         {
+            WorkLikeEnum currentWorType = form1.CurrentWorkEnum;
             uint someTimer = 0;
             for (int listNumber = 0; listNumber < form1.MaxLists;)
             {
                 var uniqueQuestion = constBlocks == null ? new List<DoneBlock>() : new List<DoneBlock>(constBlocks);
-                for (int questions = 0; questions < (maxQuestionOnList>0 ? maxQuestionOnList : (form1.MaxQuestionOnListUint-form1.NumberOfConstFiles-form1.LSTEasyNumber-form1.LSTMiddleNumber-form1.LSTHardNumber));)
+
+                long maxRepeat;
+                switch (currentWorType)
+                {
+                    case WorkLikeEnum.OnlyGenerator:
+                    {
+                        maxRepeat = form1.MaxQuestionOnListUint;
+                        break;
+                    }
+                    case WorkLikeEnum.GeneratorAndConst:
+                    {
+                        maxRepeat = form1.MaxQuestionOnListUint - form1.NumberOfConstFiles;
+                        break;
+                    }
+                    case WorkLikeEnum.GeneratorAndLST:
+                    {
+                        maxRepeat = maxQuestionOnList > 0
+                            ? maxQuestionOnList
+                            : (form1.MaxQuestionOnListUint - form1.NumberOfConstFiles - form1.LSTEasyNumber -
+                               form1.LSTMiddleNumber - form1.LSTHardNumber);
+                        break;
+                    }
+                    default:
+                    {
+                        maxRepeat = form1.MaxQuestionOnListUint;
+                        break;
+                    }
+                }
+                for (int questions = 0; questions < maxRepeat;)
                 {
                     var randBlock = RandomNumber.Between(0, randBlockCopy.Count - 1);
                     if (!uniqueQuestion.Contains(randBlockCopy[randBlock]))

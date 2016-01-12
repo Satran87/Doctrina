@@ -465,7 +465,7 @@ namespace Doctrina
 
                     foreach (var constBlock in constBlocks)
                     {
-                        constBlock.TimeRepeated = MaxLists;
+                        constBlock.TimeRepeated = constBlock.TimeRepeated+MaxLists;
                         constBlock.LastTimePrint = DateTime.Now;
                     }
                     break;
