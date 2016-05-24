@@ -452,17 +452,19 @@ namespace Doctrina
             {
                 case WorkLikeEnum.OnlyGenerator:
                 {
-                    CheckClass.GetBlocks_1(this, ref DoneBlocks, ref allQuestions);
+                        List<List<bool>> bannedSymbolsForEachList = null;//Для совместимости
+                        CheckClass.GetBlocks_1(this, ref DoneBlocks, ref allQuestions,ref bannedSymbolsForEachList);
                     break;
                 }
                 case WorkLikeEnum.GeneratorAndConst:
                 {
                     List<DoneBlock> copyedDoneBlocksWihoutCosnt = null;
-                    List<DoneBlock> constBlocks =
+                        List<List<bool>> bannedSymbolsForEachList = null;//Для совместимости
+                        List<DoneBlock> constBlocks =
                         new List<DoneBlock>(PrepareNewDoneBlockForallQuestion(ref copyedDoneBlocksWihoutCosnt));
 
                     NumberOfConstFiles = constBlocks.Count();
-                    CheckClass.GetBlocks_1(this, ref copyedDoneBlocksWihoutCosnt, ref allQuestions, constBlocks);
+                    CheckClass.GetBlocks_1(this, ref copyedDoneBlocksWihoutCosnt, ref allQuestions,ref bannedSymbolsForEachList,constBlocks);
 
                     foreach (var constBlock in constBlocks)
                     {
@@ -478,6 +480,8 @@ namespace Doctrina
                         List<DoneBlock> MiddleList = new List<DoneBlock>();
                         List<DoneBlock> HardList = new List<DoneBlock>();
 
+                        List<List<bool>> bannedSymbolsForEachList = new List<List<bool>>();
+
                         List < List < DoneBlock >> EasyDone = new List<List<DoneBlock>>();
                         List<List<DoneBlock>> MiddleDone = new List<List<DoneBlock>>();
                         List<List<DoneBlock>> HardDone = new List<List<DoneBlock>>();
@@ -490,25 +494,25 @@ namespace Doctrina
                         if (LSTEasyNumber > 0)
                         {
                             EasyList = PrepareNewDoneBlockForLST(ref copyDoneBlocks, "Л_");
-                            result = CheckClass.GetBlocks_1(this, ref EasyList, ref allQuestions,null, LSTEasyNumber);
+                            result = CheckClass.GetBlocks_1(this, ref EasyList, ref allQuestions,ref bannedSymbolsForEachList,null, LSTEasyNumber);
                             EasyDone.AddRange(allQuestions);
                             allQuestions.Clear();
                         }
                         if (LSTMiddleNumber > 0)
                         {
                             MiddleList = PrepareNewDoneBlockForLST(ref copyDoneBlocks, "С_");
-                            result = CheckClass.GetBlocks_1(this, ref MiddleList, ref allQuestions,null, LSTMiddleNumber);
+                            result = CheckClass.GetBlocks_1(this, ref MiddleList, ref allQuestions, ref bannedSymbolsForEachList,null, LSTMiddleNumber);
                             MiddleDone.AddRange(allQuestions);
                             allQuestions.Clear();
                         }
                         if (LSTHardNumber > 0)
                         {
                             HardList = PrepareNewDoneBlockForLST(ref copyDoneBlocks, "Т_");
-                            result = CheckClass.GetBlocks_1(this, ref HardList, ref allQuestions,null, LSTHardNumber);
+                            result = CheckClass.GetBlocks_1(this, ref HardList, ref allQuestions, ref bannedSymbolsForEachList, null, LSTHardNumber);
                             HardDone.AddRange(allQuestions);
                             allQuestions.Clear();
                         }
-                        result = CheckClass.GetBlocks_1(this, ref copyDoneBlocks, ref allQuestions);
+                        result = CheckClass.GetBlocks_1(this, ref copyDoneBlocks, ref allQuestions, ref bannedSymbolsForEachList);
                         if(result)
                             throw new Exception("Произошла ошибка генерации вопросов");
                         int index = 0;

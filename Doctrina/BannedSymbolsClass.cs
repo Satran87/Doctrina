@@ -37,6 +37,11 @@ namespace Doctrina
        public List<string> BannedSymbolsList
        {
            get { return _bannedSymbols; }
-       } 
+       }
+
+       public List<bool> GetBannedSymbolsPositions()
+       {
+           return _bannedSymbolMeets;
+       }
     }
 }

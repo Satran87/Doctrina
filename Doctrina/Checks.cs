@@ -19,11 +19,12 @@ namespace Doctrina
         {
             List<DoneBlock> randBlockCopy = CopyDoneBlocks(form1, form1.DoneBlocks);
             List < List < DoneBlock >> temp=new List<List<DoneBlock>>();//Для совместимости.
-            if (GetBlocks_1(form1, ref randBlockCopy,ref temp)) return true;
+            List<List<bool>> bannedSymbolsForEachList = null;//Для совместимости.
+            if (GetBlocks_1(form1, ref randBlockCopy,ref temp,ref bannedSymbolsForEachList)) return true;
             return false;
         }
 
-        internal static bool GetBlocks_1(Form1 form1, ref List<DoneBlock> randBlockCopy, ref List<List<DoneBlock>> allQuestions,List<DoneBlock> constBlocks=null,int maxQuestionOnList=0 )
+        internal static bool GetBlocks_1(Form1 form1, ref List<DoneBlock> randBlockCopy, ref List<List<DoneBlock>> allQuestions, ref List<List<bool>> BannedSymbolsForEachList, List<DoneBlock> constBlocks=null,int maxQuestionOnList=0)
         {
             WorkLikeEnum currentWorType = form1.CurrentWorkEnum;
             uint someTimer = 0;
@@ -66,6 +67,17 @@ namespace Doctrina
                         {
                             if (randBlockCopy[randBlock].ShortFileName.Contains(bannedSymbol))
                             {
+                                foreach (var newList in BannedSymbolsForEachList)
+                                {
+                                    foreach (var curList in newList)
+                                    {
+                                        if (curList)
+                                        {
+                                            bannedSymbolMeets = true;
+                                            break;
+                                        }
+                                    }
+                                }
                                 if (form1.NewBannedSymbols1.IsBannedSymbolMeet(bannedSymbolsCount)) //TODO:Проверить тщательно!
                                 {
                                     bannedSymbolMeets = true;
@@ -114,9 +126,10 @@ namespace Doctrina
                 }
                 allQuestions.Add(uniqueQuestion);
                 ++listNumber;
+                BannedSymbolsForEachList.Add(form1.NewBannedSymbols1.GetBannedSymbolsPositions());
                 form1.NewBannedSymbols1.ClearBannedSymbolMeet();
             }
-            form1.NewBannedSymbols1.ClearBannedSymbolMeet();
+                form1.NewBannedSymbols1.ClearBannedSymbolMeet();
             return false;
         }
 
