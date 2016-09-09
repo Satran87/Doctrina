@@ -12,6 +12,25 @@ namespace Doctrina
     public delegate void MyEventHandler(object sender, FileHlpArgs e);
     public class FileHlp
     {
+        public void ConvertDocToDocx(string path)
+        {
+            Application word = new Application();
+
+            if (path.ToLower().EndsWith(".doc"))
+            {
+                var sourceFile = new FileInfo(path);
+                var document = word.Documents.Open(sourceFile.FullName);
+
+                string newFileName = sourceFile.FullName.Replace(".doc", ".docx");
+                document.SaveAs2(newFileName, WdSaveFormat.wdFormatXMLDocument,
+                                 CompatibilityMode: WdCompatibilityMode.wdWord2010);
+
+                word.ActiveDocument.Close();
+                word.Quit();
+
+                File.Delete(path);
+            }
+        }
         public event MyEventHandler MyEvent;
         protected virtual void OnMyEvent(FileHlpArgs e)
         {
@@ -69,64 +88,6 @@ namespace Doctrina
                 DeleteAllFilesOnTempDirectory();
                 throw new Exception("Ошибка при создании файла");
             }
-        }
-        private void GenerateDocFiles(string newFileName,string oldFileName, bool isAnswer)
-        {
-            object unit = WdUnits.wdStory;
-            object extend = WdMovementType.wdMove;
-            Document doc = null;
-            bool isDocExist = false;
-            if (!Directory.Exists("TempFolder"))
-            {
-                Directory.CreateDirectory("TempFolder");
-
-            }
-            newFileName = GetTempDirectory() + newFileName;
-            if (isAnswer)
-            {
-                newFileName = newFileName + "_Ans";
-            }
-            else
-            {
-                newFileName = newFileName + "_Ques";
-            }
-            string fullName = newFileName + ".docx";
-            try
-            {
-                if (File.Exists(fullName))
-                {
-                    doc = myWord.Documents.Open(fullName);
-                    Thread.Sleep(20);//Возможны проблемы с документом. Тормознуть.
-                    isDocExist = true;
-                }
-                else
-                {
-                    doc = myWord.Documents.Add();
-                }
-
-                if (isDocExist)
-                {
-                    myWord.Selection.EndKey(ref unit, ref extend);
-                    myWord.Selection.InsertBreak(WdBreakType.wdSectionBreakNextPage);
-                    Thread.Sleep(20);//Возможны проблемы с документом. Тормознуть.
-                    myWord.Selection.InsertFile(oldFileName);
-                }
-                else
-                {
-                    myWord.Selection.EndKey(ref unit, ref extend);
-                    Thread.Sleep(20);//Возможны проблемы с документом. Тормознуть.
-                    myWord.Selection.InsertFile(oldFileName);
-                }
-        }
-            catch (Exception e)
-            {
-                doc.Close();
-                ErrorLog.AddNewEntry(e.Message);
-                DeleteAllFilesOnTempDirectory();
-                throw new Exception("Ошибка при создании файла");
-            }
-            doc.SaveAs(FileName: fullName);
-            doc.Close();
         }
 
         public string GetCurrentDirectory()

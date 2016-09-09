@@ -19,7 +19,7 @@ namespace Doctrina
         {
             List<DoneBlock> randBlockCopy = CopyDoneBlocks(form1, form1.DoneBlocks);
             List < List < DoneBlock >> temp=new List<List<DoneBlock>>();//Для совместимости.
-            List<List<bool>> bannedSymbolsForEachList = null;//Для совместимости.
+            List<List<bool>> bannedSymbolsForEachList = new List<List<bool>>();//Для совместимости.
             if (GetBlocks_1(form1, ref randBlockCopy,ref temp,ref bannedSymbolsForEachList)) return true;
             return false;
         }

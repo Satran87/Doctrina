@@ -7,7 +7,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
-using Doctrina.eEgg;
 using Doctrina.Enums;
 
 namespace Doctrina
@@ -25,6 +24,10 @@ namespace Doctrina
         private const string MaxQuestionOnListString = "MaxQuestionOnList=";
         private const string MaxQuestionRepeatString = "MaxQuestionRepeat=";
         private const string BannedSymbolsString = "BannedSymbols=";
+        private const string EasyQuestionString = "Easy=";
+        private const string MiddleQuestionString = "Middle=";
+        private const string HardQuestionString = "Hard=";
+        private const string ModeString = "Mode=";
 
         public WorkLikeEnum CurrentWorkEnum=WorkLikeEnum.OnlyGenerator;
         public int LSTEasyNumber = 0;
@@ -114,7 +117,6 @@ namespace Doctrina
             backgroundWorker2.DoWork += BackgroundWorker2_DoWork;
             cancelButton.Enabled = false;
             InitMyComponents();
-            EnableLSTFields(false);
         }
 
 
@@ -166,6 +168,48 @@ namespace Doctrina
                     var bannedSymbols= line.Replace(BannedSymbolsString, "");
                     NewBannedSymbols1 = new BannedSymbolsClass(bannedSymbols.Split('|'));
                 }
+                if (line.Contains(EasyQuestionString))
+                {
+                    var tempstring = line.Replace(EasyQuestionString, "");
+                    LSTEasyNumber = Convert.ToInt32(tempstring);
+                }
+                if (line.Contains(MiddleQuestionString))
+                {
+                    var tempstring = line.Replace(MiddleQuestionString, "");
+                    LSTMiddleNumber = Convert.ToInt32(tempstring);
+                    
+                }
+                if (line.Contains(HardQuestionString))
+                {
+                    var tempstring = line.Replace(HardQuestionString, "");
+                    LSTHardNumber = Convert.ToInt32(tempstring);
+                }
+                if (line.Contains(ModeString))
+                {
+                    var tempstring = line.Replace(ModeString, "");
+                    switch (Convert.ToInt32(tempstring))
+                    {
+                        case 1:
+                        {
+                            CurrentWorkEnum = WorkLikeEnum.OnlyGenerator;
+                            break;
+                        }
+                        case 2:
+                        {
+                            CurrentWorkEnum = WorkLikeEnum.GeneratorAndConst;
+                            break;
+                        }
+                        case 3:
+                        {
+                            CurrentWorkEnum = WorkLikeEnum.GeneratorAndLST;
+                            break;
+                        }
+                        default:
+                            OnErrorHappen("Не указан режим работы");
+                            break;
+                    }
+                }
+                ReCreateDT();
             }
         }
 
@@ -274,6 +318,7 @@ namespace Doctrina
 
             if(hasNewFiles)
             {
+                ConvertDocToDocX(folderPath);
                 var allAnswerFiles = Directory.GetFiles(folderPath, "*Р?.docx", SearchOption.TopDirectoryOnly);
                 var allQuestionFiles = Directory.GetFiles(folderPath, "*У?.docx*", SearchOption.TopDirectoryOnly);
                 if (allQuestionFiles.Count() != allAnswerFiles.Count())
@@ -302,6 +347,33 @@ namespace Doctrina
                     }
                 }
             } 
+        }
+
+        /// <summary>
+        /// Если будут встречаться Doc файлы, то их надо конвертировать в DocX для работы
+        /// </summary>
+        /// <param name="folderPath"></param>
+        private void ConvertDocToDocX(string folderPath)
+        {
+            try
+            {
+                var tempDocQ = Directory.GetFiles(folderPath, "*Р?.doc", SearchOption.TopDirectoryOnly);
+                var tempDocA = Directory.GetFiles(folderPath, "*У?.doc", SearchOption.TopDirectoryOnly);
+                foreach (var tmp in tempDocQ)
+                {
+                    _wordHlp.ConvertDocToDocx(tmp);
+                }
+                foreach (var tmp in tempDocA)
+                {
+                    _wordHlp.ConvertDocToDocx(tmp);
+                }
+            }
+            catch (Exception e)
+            {
+                OnErrorHappen("Не смог конвертировать файл с расширением Doc в DocX из-за " + e.Message);
+                throw;
+            }
+
         }
 
         private  string ReplaceEndOfFile(string fileName)
@@ -401,10 +473,6 @@ namespace Doctrina
                 MaxQuestionOnListUint = Convert.ToUInt32(MaxQuestionOnListText.Text);
                 MaxQuestonRepeatUint = Convert.ToUInt32(MaxQuestionRepeatText.Text);
                 MaxLists = Convert.ToUInt32(NumberOfLists.Text);
-
-                LSTEasyNumber = Convert.ToInt32(EasytextBox.Text);
-                LSTMiddleNumber = Convert.ToInt32(MiddletextBox.Text);
-                LSTHardNumber = Convert.ToInt32(HardtextBox.Text);
             }
             catch (Exception)
             {
@@ -452,14 +520,14 @@ namespace Doctrina
             {
                 case WorkLikeEnum.OnlyGenerator:
                 {
-                        List<List<bool>> bannedSymbolsForEachList = null;//Для совместимости
+                        List<List<bool>> bannedSymbolsForEachList =new List<List<bool>>();//Для совместимости
                         CheckClass.GetBlocks_1(this, ref DoneBlocks, ref allQuestions,ref bannedSymbolsForEachList);
                     break;
                 }
                 case WorkLikeEnum.GeneratorAndConst:
                 {
-                    List<DoneBlock> copyedDoneBlocksWihoutCosnt = null;
-                        List<List<bool>> bannedSymbolsForEachList = null;//Для совместимости
+                    List<DoneBlock> copyedDoneBlocksWihoutCosnt = new List<DoneBlock>();
+                        List<List<bool>> bannedSymbolsForEachList = new List<List<bool>>();//Для совместимости
                         List<DoneBlock> constBlocks =
                         new List<DoneBlock>(PrepareNewDoneBlockForallQuestion(ref copyedDoneBlocksWihoutCosnt));
 
@@ -796,10 +864,6 @@ namespace Doctrina
                 answerCheckBox.Enabled = false;
                 questionCheckBox.Enabled = false;
                 datagridForDataTable.Enabled = false;
-                OnlyGeneratorRadioButon.Enabled = false;
-                GeneratorAndConstRadioButton.Enabled = false;
-                GeneratorAndLSTradioButton.Enabled = false;
-                EnableLSTFields(false);
             }
             else
             {
@@ -814,13 +878,6 @@ namespace Doctrina
                 answerCheckBox.Enabled = true;
                 questionCheckBox.Enabled = true;
                 datagridForDataTable.Enabled = true;
-                OnlyGeneratorRadioButon.Enabled = true;
-                GeneratorAndConstRadioButton.Enabled = true;
-                GeneratorAndLSTradioButton.Enabled = true;
-                if (CurrentWorkEnum==WorkLikeEnum.GeneratorAndLST)
-                {
-                    EnableLSTFields(true);
-                }
                 cancelButton.Enabled = false;
                 progressBar1.Style = ProgressBarStyle.Blocks;
                 FillList();
@@ -849,7 +906,7 @@ namespace Doctrina
             MessageBox.Show(text, "Произошла ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             ErrorLog.AddNewEntry(text);
         }
-        private bool OnErrorHappenYesNo(string text)
+        public bool OnErrorHappenYesNo(string text)
         {
            var code= MessageBox.Show(text, "Произошла ошибка", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
             ErrorLog.AddNewEntry(text);
@@ -966,80 +1023,18 @@ namespace Doctrina
         private void NumberOfLists_TextChanged(object sender, EventArgs e)
         {
             MaxLists=string.IsNullOrEmpty(NumberOfLists.Text) ? 0: Convert.ToUInt32(NumberOfLists.Text);
-            //
-            if (!MaxQuestionOnListSecond && !MaxQuestionRepeatThird)
-            {
-                ListFirst = true;
-            }
-            else
-            {
-                ListFirst = false;
-                MaxQuestionOnListSecond = false;
-                MaxQuestionRepeatThird = false;
-            }
+            
         }
-        #region eEgg
 
-        private bool ListFirst = false;
-        private bool MaxQuestionOnListSecond = false;
-        private bool MaxQuestionRepeatThird = false;
-        private bool played = false;
-        #endregion
         private void MaxQuestionRepeatText_TextChanged(object sender, EventArgs e)
         {
             MaxQuestonRepeatUint = string.IsNullOrEmpty(MaxQuestionRepeatText.Text) ? 0 : Convert.ToUInt32(MaxQuestionRepeatText.Text);
             colorTable();
-            //
-            //
-            if (ListFirst && MaxQuestionOnListSecond)
-            {
-                MaxQuestionRepeatThird = true;
-            }
-            else
-            {
-                ListFirst = false;
-                MaxQuestionOnListSecond = false;
-                MaxQuestionRepeatThird = false;
-            }
-            ///
-            if (!played)
-            {
-                if (ListFirst && MaxQuestionOnListSecond && MaxQuestionRepeatThird)
-                {
-                    if (MaxLists == 557)
-                    {
-                        if (MaxQuestionOnListUint == 30)
-                        {
-                            if (MaxQuestonRepeatUint == 27)
-                            {
-                                if (DateThenAllowPrint.Year == 2050)
-                                {
-                                    EEggPlayer fun = new EEggPlayer();
-                                    fun.ShowDialog(Owner);
-                                    ErrorLog.AddNewEntry("Это всё же кто-то увидел -))");
-                                    played = true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         private void MaxQuestionOnListText_TextChanged(object sender, EventArgs e)
         {
             MaxQuestionOnListUint = string.IsNullOrEmpty(MaxQuestionOnListText.Text) ? 0 : Convert.ToUInt32(MaxQuestionOnListText.Text);
-            //
-            if (ListFirst && !MaxQuestionRepeatThird)
-            {
-                MaxQuestionOnListSecond = true;
-            }
-            else
-            {
-                ListFirst = false;
-                MaxQuestionOnListSecond = false;
-                MaxQuestionRepeatThird = false;
-            }
         }
 
         private void dateThenAllowPrintPicker_ValueChanged(object sender, EventArgs e)
@@ -1117,88 +1112,6 @@ namespace Doctrina
         private void datagridForDataTable_ColumnHeaderMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
         {
             colorTable();
-        }
-
-        private void OnlyGeneratorRadioButon_CheckedChanged(object sender, EventArgs e)
-        {
-            if (OnlyGeneratorRadioButon.Checked)
-            {
-                WorkLikeChanged(WorkLikeEnum.OnlyGenerator);
-            }
-        }
-
-        
-
-        private void GeneratorAndConstRadioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            if (GeneratorAndConstRadioButton.Checked)
-            {
-                WorkLikeChanged(WorkLikeEnum.GeneratorAndConst);
-            }
-        }
-
-        private void GeneratorAndLSTradioButton_CheckedChanged(object sender, EventArgs e)
-        {
-            if (GeneratorAndLSTradioButton.Checked)
-            {
-                WorkLikeChanged(WorkLikeEnum.GeneratorAndLST);
-            }
-
-        }
-        private void WorkLikeChanged(WorkLikeEnum howNow)
-        {
-            switch (howNow)
-            {
-                case WorkLikeEnum.OnlyGenerator:
-                    {
-                        CurrentWorkEnum = howNow;
-                        GeneratorAndConstRadioButton.Checked = false;
-                        GeneratorAndLSTradioButton.Checked = false;
-                        EnableLSTFields(false);
-                        ReCreateDT();
-                        break;
-                    }
-
-                case WorkLikeEnum.GeneratorAndConst:
-                    {
-                        CurrentWorkEnum = howNow;
-                        OnlyGeneratorRadioButon.Checked = false;
-                        GeneratorAndLSTradioButton.Checked = false;
-                        EnableLSTFields(false);
-                        ReCreateDT();
-                        break;
-                    }
-                case WorkLikeEnum.GeneratorAndLST:
-                    {
-                        CurrentWorkEnum = howNow;
-                        GeneratorAndConstRadioButton.Checked = false;
-                        GeneratorAndConstRadioButton.Checked = false;
-                        EnableLSTFields(true);
-                        ReCreateDT();
-                        break;
-                    }
-            }
-        }
-
-        private void EnableLSTFields(bool enable)
-        {
-            EasytextBox.Enabled = enable;
-            MiddletextBox.Enabled = enable;
-            HardtextBox.Enabled = enable;
-        }
-        private void EasytextBox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            CheckIsDigit(e);
-        }
-
-        private void MiddletextBox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            CheckIsDigit(e);
-        }
-
-        private void HardtextBox_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            CheckIsDigit(e);
         }
 
         private void SaveButton_Click(object sender, EventArgs e)
