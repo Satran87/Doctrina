@@ -152,9 +152,13 @@
             this.Controls.Add(this.HardtextBox);
             this.Controls.Add(this.MiddletextBox);
             this.Controls.Add(this.EasytextBox);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(428, 282);
+            this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(428, 282);
             this.Name = "Настройка";
-            this.Text = "Form1";
+            this.Text = "Настройка";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

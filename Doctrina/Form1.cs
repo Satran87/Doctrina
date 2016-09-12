@@ -318,7 +318,7 @@ namespace Doctrina
 
             if(hasNewFiles)
             {
-                ConvertDocToDocX(folderPath);
+                CheckFolderForDocFiles(folderPath);
                 var allAnswerFiles = Directory.GetFiles(folderPath, "*Р?.docx", SearchOption.TopDirectoryOnly);
                 var allQuestionFiles = Directory.GetFiles(folderPath, "*У?.docx*", SearchOption.TopDirectoryOnly);
                 if (allQuestionFiles.Count() != allAnswerFiles.Count())
@@ -350,22 +350,34 @@ namespace Doctrina
         }
 
         /// <summary>
-        /// Если будут встречаться Doc файлы, то их надо конвертировать в DocX для работы
+        /// Проверяем папку на наличие Doc файлов. При необходимости конвертируем
         /// </summary>
         /// <param name="folderPath"></param>
-        private void ConvertDocToDocX(string folderPath)
+        private void CheckFolderForDocFiles(string folderPath)
+        {
+            DirectoryInfo testDir = new DirectoryInfo(folderPath);
+            var fileInfoArray =
+                testDir.GetFiles("*", SearchOption.TopDirectoryOnly)
+                    .Where(f => f.Extension == ".doc")
+                    .ToArray<FileInfo>();
+            if (fileInfoArray.Any())
+                if (
+                    OnErrorHappenYesNo(
+                        "Папка содержит файлы с расширением Doc \n\rДля работы программы нужно, чтобы файлы имели расширение Docx.\n\rПровести конвертацию?"))
+                    ConvertDocToDocX(fileInfoArray);
+        }
+
+        /// <summary>
+        /// Если будут встречаться Doc файлы, то их надо конвертировать в DocX для работы
+        /// </summary>
+        /// <param name="fileInfoArray"></param>
+        private void ConvertDocToDocX(FileInfo[] fileInfoArray)
         {
             try
             {
-                var tempDocQ = Directory.GetFiles(folderPath, "*Р?.doc", SearchOption.TopDirectoryOnly);
-                var tempDocA = Directory.GetFiles(folderPath, "*У?.doc", SearchOption.TopDirectoryOnly);
-                foreach (var tmp in tempDocQ)
+                foreach (var tmp in fileInfoArray)
                 {
-                    _wordHlp.ConvertDocToDocx(tmp);
-                }
-                foreach (var tmp in tempDocA)
-                {
-                    _wordHlp.ConvertDocToDocx(tmp);
+                    _wordHlp.ConvertDocToDocx(tmp.FullName);
                 }
             }
             catch (Exception e)
@@ -373,7 +385,6 @@ namespace Doctrina
                 OnErrorHappen("Не смог конвертировать файл с расширением Doc в DocX из-за " + e.Message);
                 throw;
             }
-
         }
 
         private  string ReplaceEndOfFile(string fileName)
