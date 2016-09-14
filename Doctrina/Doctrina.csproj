@@ -173,6 +173,12 @@
   <ItemGroup>
     <None Include="Resources\eEgg.avi" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IniHlp\IniHlp.csproj">
+      <Project>{1061e74a-03e4-4ea1-9f20-1f9916395c44}</Project>
+      <Name>IniHlp</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

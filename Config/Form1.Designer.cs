@@ -1,6 +1,6 @@
 ﻿namespace Config
 {
-    partial class Настройка
+    partial class SettingsForm
     {
         /// <summary>
         /// Required designer variable.
@@ -74,6 +74,7 @@
             this.HardtextBox.Size = new System.Drawing.Size(100, 20);
             this.HardtextBox.TabIndex = 31;
             this.HardtextBox.Text = "0";
+            this.HardtextBox.TextChanged += new System.EventHandler(this.Enabled_SaveButton);
             this.HardtextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.HardtextBox_KeyPress);
             // 
             // MiddletextBox
@@ -83,6 +84,7 @@
             this.MiddletextBox.Size = new System.Drawing.Size(100, 20);
             this.MiddletextBox.TabIndex = 30;
             this.MiddletextBox.Text = "0";
+            this.MiddletextBox.TextChanged += new System.EventHandler(this.Enabled_SaveButton);
             this.MiddletextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.MiddletextBox_KeyPress);
             // 
             // EasytextBox
@@ -92,6 +94,7 @@
             this.EasytextBox.Size = new System.Drawing.Size(100, 20);
             this.EasytextBox.TabIndex = 29;
             this.EasytextBox.Text = "0";
+            this.EasytextBox.TextChanged += new System.EventHandler(this.Enabled_SaveButton);
             this.EasytextBox.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.EasytextBox_KeyPress);
             // 
             // GeneratorAndLSTradioButton
@@ -104,6 +107,7 @@
             this.GeneratorAndLSTradioButton.TabStop = true;
             this.GeneratorAndLSTradioButton.Text = "Стандартный режим + ЛСТ";
             this.GeneratorAndLSTradioButton.UseVisualStyleBackColor = true;
+            this.GeneratorAndLSTradioButton.CheckedChanged += new System.EventHandler(this.Enabled_SaveButton);
             // 
             // GeneratorAndConstRadioButton
             // 
@@ -114,6 +118,7 @@
             this.GeneratorAndConstRadioButton.TabIndex = 36;
             this.GeneratorAndConstRadioButton.Text = "Стандартный режим + константа";
             this.GeneratorAndConstRadioButton.UseVisualStyleBackColor = true;
+            this.GeneratorAndConstRadioButton.CheckedChanged += new System.EventHandler(this.Enabled_SaveButton);
             // 
             // OnlyGeneratorRadioButon
             // 
@@ -126,6 +131,7 @@
             this.OnlyGeneratorRadioButon.TabStop = true;
             this.OnlyGeneratorRadioButon.Text = "Стандартный режим";
             this.OnlyGeneratorRadioButon.UseVisualStyleBackColor = true;
+            this.OnlyGeneratorRadioButon.CheckedChanged += new System.EventHandler(this.Enabled_SaveButton);
             // 
             // Save_button
             // 
@@ -141,7 +147,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(412, 248);
+            this.ClientSize = new System.Drawing.Size(412, 244);
             this.Controls.Add(this.Save_button);
             this.Controls.Add(this.GeneratorAndLSTradioButton);
             this.Controls.Add(this.GeneratorAndConstRadioButton);
@@ -157,7 +163,7 @@
             this.MaximumSize = new System.Drawing.Size(428, 282);
             this.MinimizeBox = false;
             this.MinimumSize = new System.Drawing.Size(428, 282);
-            this.Name = "Настройка";
+            this.Name = "SettingsForm";
             this.Text = "Настройка";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);

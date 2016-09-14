@@ -10,12 +10,13 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Doctrina.Enums;
 using Config;
+using IniHlp;
 
 namespace Config
 {
-    public partial class Настройка : Form
+    public partial class SettingsForm : Form
     {
-        
+        private IniHlpClass IniHlp;
         private const string EasyQuestionString = "Easy=";
         private const string MiddleQuestionString = "Middle=";
         private const string HardQuestionString = "Hard=";
@@ -32,7 +33,7 @@ namespace Config
         /// 3 - Способ работы
         /// </summary>
         public int [] PositionArray =new int[4];
-        public Настройка()
+        public SettingsForm()
         {
             InitializeComponent();
         }
@@ -40,66 +41,45 @@ namespace Config
         private void Form1_Load(object sender, EventArgs e)
         {
             InitMyComponents();
+            SetDataToUI();
+            Save_button.Enabled = false;
         }
+
         private void InitMyComponents()
         {
-            if (!File.Exists("config.ini"))
+            try
             {
-                Error.OnErrorHappen("Файл config.ini не найден. Запуск невозможен");
+                IniHlp = new IniHlpClass("config.ini");
+                LSTEasyNumber = IniHlp.GetIntFromLine(EasyQuestionString);
+                LSTMiddleNumber = IniHlp.GetIntFromLine(MiddleQuestionString);
+                LSTHardNumber = IniHlp.GetIntFromLine(HardQuestionString);
+                switch (IniHlp.GetIntFromLine(ModeString))
+                {
+                    case 1:
+                    {
+                        CurrentWorkEnum = WorkLikeEnum.OnlyGenerator;
+                        break;
+                    }
+                    case 2:
+                    {
+                        CurrentWorkEnum = WorkLikeEnum.GeneratorAndConst;
+                        break;
+                    }
+                    case 3:
+                    {
+                        CurrentWorkEnum = WorkLikeEnum.GeneratorAndLST;
+                        break;
+                    }
+                    default:
+                        Error.OnErrorHappen("Не указан режим работы");
+                        break;
+                }
+            }
+            catch (Exception exception)
+            {
+                Error.OnErrorHappen(exception.Message);
                 Environment.Exit(0);
             }
-
-            var lines = File.ReadAllLines("config.ini", Encoding.Default);
-            int lineCounter = -1;
-            foreach (var line in lines)
-            {
-                ++lineCounter;
-                if (line.Contains(EasyQuestionString))
-                {
-                    var tempstring = line.Replace(EasyQuestionString, "");
-                    LSTEasyNumber = Convert.ToInt32(tempstring);
-                    PositionArray[0] = lineCounter;
-                }
-                if (line.Contains(MiddleQuestionString))
-                {
-                    var tempstring = line.Replace(MiddleQuestionString, "");
-                    LSTMiddleNumber = Convert.ToInt32(tempstring);
-                    PositionArray[1] = lineCounter;
-                }
-                if (line.Contains(HardQuestionString))
-                {
-                    var tempstring = line.Replace(HardQuestionString, "");
-                    LSTHardNumber = Convert.ToInt32(tempstring);
-                    PositionArray[2] = lineCounter;
-                }
-                if (line.Contains(ModeString))
-                {
-                    var tempstring = line.Replace(ModeString, "");
-                    switch (Convert.ToInt32(tempstring))
-                    {
-                        case 1:
-                            {
-                                CurrentWorkEnum = WorkLikeEnum.OnlyGenerator;
-                                break;
-                            }
-                        case 2:
-                            {
-                                CurrentWorkEnum = WorkLikeEnum.GeneratorAndConst;
-                                break;
-                            }
-                        case 3:
-                            {
-                                CurrentWorkEnum = WorkLikeEnum.GeneratorAndLST;
-                                break;
-                            }
-                        default:
-                            Error.OnErrorHappen("Не указан режим работы");
-                            break;
-                    }
-                    PositionArray[3] = lineCounter;
-                }
-            }
-            SetDataToUI();
         }
 
         private void SetDataToUI()
@@ -143,16 +123,23 @@ namespace Config
             if(GeneratorAndLSTradioButton.Checked)
                 CurrentWorkEnum = WorkLikeEnum.GeneratorAndLST;
             SaveAll();
+            Save_button.Enabled = false;
         }
-
+        /// <summary>
+        /// Если были изменения в форме, активировать кнопку сохранения
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Enabled_SaveButton(object sender, EventArgs e)
+        {
+            Save_button.Enabled = true;
+        }
         private void SaveAll()
         {
-            var lines = File.ReadAllLines("config.ini", Encoding.Default);
-            lines[PositionArray[0]] = EasyQuestionString + EasytextBox.Text;
-            lines[PositionArray[1]] = MiddleQuestionString + MiddletextBox.Text;
-            lines[PositionArray[2]] = HardQuestionString + HardtextBox.Text;
-            lines[PositionArray[3]] = ModeString + Convert.ToInt32(CurrentWorkEnum);
-            File.WriteAllLines("config.ini", lines);
+            IniHlp.SaveDataToIniFile(EasyQuestionString, EasytextBox.Text);
+            IniHlp.SaveDataToIniFile(MiddleQuestionString, MiddletextBox.Text);
+            IniHlp.SaveDataToIniFile(HardQuestionString, HardtextBox.Text);
+            IniHlp.SaveDataToIniFile(ModeString, Convert.ToInt32(CurrentWorkEnum).ToString());
         }
 
         private void EasytextBox_KeyPress(object sender, KeyPressEventArgs e)

@@ -16,7 +16,7 @@ namespace Config
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Настройка());
+            Application.Run(new SettingsForm());
         }
     }
 }

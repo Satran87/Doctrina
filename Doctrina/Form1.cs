@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using Doctrina.Enums;
+using IniHlp;
 
 namespace Doctrina
 {
@@ -119,100 +120,68 @@ namespace Doctrina
             InitMyComponents();
         }
 
-
+        private IniHlpClass IniHlp;
 
         private void InitMyComponents()
         {
-            if (!File.Exists("config.ini"))
+            if (!File.Exists(ConfigIniFileName))
             {
-                OnErrorHappen("Файл config.ini не найден. Запуск невозможен");
+                OnErrorHappen("Файл "+ ConfigIniFileName + " не найден. Запуск невозможен");
                 Environment.Exit(0);
             }
-                
-                var lines = File.ReadAllLines("config.ini", Encoding.Default);
-            foreach (var line in lines)
-            {
-                if (line.Contains(DateThenAllowPrintPickerString))
-                {
-                    var newLine = line.Replace(DateThenAllowPrintPickerString, "");
-                    if (string.IsNullOrEmpty(newLine)) newLine = "2015-01-01";
-                    dateThenAllowPrintPicker.Value = Convert.ToDateTime(newLine);
-                    continue;
-                }
-                if (line.Contains(NumberOfListsString))
-                {
-                    var newLine = line.Replace(NumberOfListsString, "");
-                    NumberOfLists.Text = newLine;
-                    if (string.IsNullOrEmpty(newLine)) newLine = "1";
-                    MaxLists =Convert.ToUInt32(newLine);
-                    continue;
-                }
-                if (line.Contains(MaxQuestionOnListString))
-                {
-                    var newLine = line.Replace(MaxQuestionOnListString, "");
-                    MaxQuestionOnListText.Text = newLine;
-                    if (string.IsNullOrEmpty(newLine)) newLine = "1";
-                    MaxQuestionOnListUint = Convert.ToUInt32(newLine);
-                    continue;
-                }
-                if (line.Contains(MaxQuestionRepeatString))
-                {
-                    var newLine = line.Replace(MaxQuestionRepeatString, "");
-                    MaxQuestionRepeatText.Text = newLine;
-                    if (string.IsNullOrEmpty(newLine)) newLine = "1";
-                    MaxQuestonRepeatUint = Convert.ToUInt32(newLine);
-                    continue;
-                }
-                if (line.Contains(BannedSymbolsString))
-                {
-                    var bannedSymbols= line.Replace(BannedSymbolsString, "");
-                    NewBannedSymbols1 = new BannedSymbolsClass(bannedSymbols.Split('|'));
-                }
-                if (line.Contains(EasyQuestionString))
-                {
-                    var tempstring = line.Replace(EasyQuestionString, "");
-                    LSTEasyNumber = Convert.ToInt32(tempstring);
-                }
-                if (line.Contains(MiddleQuestionString))
-                {
-                    var tempstring = line.Replace(MiddleQuestionString, "");
-                    LSTMiddleNumber = Convert.ToInt32(tempstring);
-                    
-                }
-                if (line.Contains(HardQuestionString))
-                {
-                    var tempstring = line.Replace(HardQuestionString, "");
-                    LSTHardNumber = Convert.ToInt32(tempstring);
-                }
-                if (line.Contains(ModeString))
-                {
-                    var tempstring = line.Replace(ModeString, "");
-                    switch (Convert.ToInt32(tempstring))
-                    {
-                        case 1:
-                        {
-                            CurrentWorkEnum = WorkLikeEnum.OnlyGenerator;
-                            break;
-                        }
-                        case 2:
-                        {
-                            CurrentWorkEnum = WorkLikeEnum.GeneratorAndConst;
-                            break;
-                        }
-                        case 3:
-                        {
-                            CurrentWorkEnum = WorkLikeEnum.GeneratorAndLST;
-                            break;
-                        }
-                        default:
-                            OnErrorHappen("Не указан режим работы");
-                            break;
-                    }
-                }
-                ReCreateDT();
-            }
-        }
+            IniHlp = new IniHlpClass(ConfigIniFileName);
 
+            var newLine = IniHlp.GetDateTimeFromLine(DateThenAllowPrintPickerString);
+            if (newLine.Year == 1) newLine = Convert.ToDateTime("2015-01-01");
+            dateThenAllowPrintPicker.Value = newLine;
+
+            string tempStr = string.Empty;
+            tempStr = IniHlp.GetStringFromLine(NumberOfListsString);
+            NumberOfLists.Text = tempStr;
+            if (string.IsNullOrEmpty(tempStr)) tempStr = "1";
+            MaxLists = Convert.ToUInt32(tempStr);
+
+            tempStr = IniHlp.GetStringFromLine(MaxQuestionOnListString);
+            MaxQuestionOnListText.Text = tempStr;
+            if (string.IsNullOrEmpty(tempStr)) tempStr = "1";
+            MaxQuestionOnListUint = Convert.ToUInt32(tempStr);
+
+            tempStr = IniHlp.GetStringFromLine(MaxQuestionRepeatString);
+            MaxQuestionRepeatText.Text = tempStr;
+            if (string.IsNullOrEmpty(tempStr)) tempStr = "1";
+            MaxQuestonRepeatUint= Convert.ToUInt32(tempStr);
+
+            var bannedSymbols = IniHlp.GetStringFromLine(BannedSymbolsString);
+            NewBannedSymbols1 = new BannedSymbolsClass(bannedSymbols.Split('|'));
+
+            LSTEasyNumber = IniHlp.GetIntFromLine(EasyQuestionString);
+            LSTMiddleNumber = IniHlp.GetIntFromLine(MiddleQuestionString);
+            LSTHardNumber = IniHlp.GetIntFromLine(HardQuestionString);
+            {
+                switch (IniHlp.GetIntFromLine(ModeString))
+                {
+                    case 1:
+                    {
+                        CurrentWorkEnum = WorkLikeEnum.OnlyGenerator;
+                        break;
+                    }
+                    case 2:
+                    {
+                        CurrentWorkEnum = WorkLikeEnum.GeneratorAndConst;
+                        break;
+                    }
+                    case 3:
+                    {
+                        CurrentWorkEnum = WorkLikeEnum.GeneratorAndLST;
+                        break;
+                    }
+                    default:
+                        OnErrorHappen("Не указан режим работы");
+                        break;
+                }
+            }
+            ReCreateDT();
+        }
 
         private void BackgroundWorker1OnDoWork(object sender, DoWorkEventArgs doWorkEventArgs)
         {
@@ -740,11 +709,6 @@ namespace Doctrina
             MyDt.Rows.Add(row);
         }
 
-        private void Form1_Load(object sender, EventArgs e)
-        {
-            CreateDt();
-        }
-
         //TODO:Переделать механизм - постоянно передергивает. Предложить сохранять?
         private void datagridForDataTable_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
@@ -930,38 +894,10 @@ namespace Doctrina
         {
             if (File.Exists(ConfigIniFileName))
             {
-               var lines= File.ReadAllLines(ConfigIniFileName, Encoding.GetEncoding("windows-1251"));
-                for(var t=0;t<lines.Count();++t)
-                {
-                    if (lines[t].Contains(DateThenAllowPrintPickerString))
-                    {
-                        lines[t] = DateThenAllowPrintPickerString + DateThenAllowPrint;
-                        continue;
-                    }
-                    if (lines[t].Contains(NumberOfListsString))
-                    {
-                        lines[t] = NumberOfListsString + NumberOfLists.Text;
-                        continue;
-                    }
-                    if (lines[t].Contains(MaxQuestionOnListString))
-                    {
-                        lines[t] = MaxQuestionOnListString + MaxQuestionOnListText.Text;
-                        continue;
-                    }
-                    if (lines[t].Contains(MaxQuestionRepeatString))
-                    {
-                        lines[t] = MaxQuestionRepeatString + MaxQuestionRepeatText.Text;
-                        continue;
-                    }
-                }
-                using (var sw = new StreamWriter(ConfigIniFileName, false))
-                {
-                    foreach (var line in lines)
-                    {
-                        sw.WriteLine(line);
-                    }
-                    sw.Close();
-                }
+                IniHlp.SaveDataToIniFile(DateThenAllowPrintPickerString, DateThenAllowPrint.ToString());
+                IniHlp.SaveDataToIniFile(NumberOfListsString, NumberOfLists.Text);
+                IniHlp.SaveDataToIniFile(MaxQuestionOnListString, MaxQuestionOnListText.Text);
+                IniHlp.SaveDataToIniFile(MaxQuestionRepeatString, MaxQuestionRepeatText.Text);
             }
         }
 
