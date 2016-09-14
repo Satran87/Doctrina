@@ -767,8 +767,11 @@ namespace Doctrina
         {
             if (MyDt.Rows.Count>1)
             {
+                //Перенес из сохранения констант  в datagridForDataTable_CellEndEdit
+                //
                 MyDt.AcceptChanges();
                 ((DataTable)datagridForDataTable.DataSource).AcceptChanges();
+                //
 
                 folderPath = folderPath + @"\" + FileNameListText;
                 if (!File.Exists(folderPath))

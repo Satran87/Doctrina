@@ -109,6 +109,7 @@
     <Compile Include="DoctrinaMainForm.Designer.cs">
       <DependentUpon>DoctrinaMainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="OwnRandomGenerator.cs" />
     <Compile Include="PassCheck.cs">
       <SubType>Form</SubType>
