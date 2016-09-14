@@ -1,6 +1,6 @@
 ﻿namespace Doctrina
 {
-    partial class Form1
+    partial class DoctrinaMainForm
     {
         /// <summary>
         /// Required designer variable.

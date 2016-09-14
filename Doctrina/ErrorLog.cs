@@ -19,7 +19,7 @@ namespace Doctrina
             using (var sw = new StreamWriter("errorLog.log",true))
             {
                 sw.WriteLine("{0}:{1}", DateTime.Now, text);
-                sw.Close();
+                //sw.Close();
             }
         }
 

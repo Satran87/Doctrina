@@ -25,14 +25,6 @@ namespace Config
         public int LSTEasyNumber = 0;
         public int LSTMiddleNumber = 0;
         public int LSTHardNumber = 0;
-        /// <summary>
-        /// Позиция элемента в документе
-        /// 0 - Легкий
-        /// 1- Средний 
-        /// 2 - Тяжелый
-        /// 3 - Способ работы
-        /// </summary>
-        public int [] PositionArray =new int[4];
         public SettingsForm()
         {
             InitializeComponent();

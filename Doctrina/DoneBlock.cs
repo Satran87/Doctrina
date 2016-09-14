@@ -8,8 +8,8 @@ namespace Doctrina
 {
     public class DoneBlock
     {
-        private readonly Form1 _myForm;
-        public DoneBlock(Form1 form, string qPath, string aPath, DateTime lPrintTime, uint timeRepeated = 0)
+        private readonly DoctrinaMainForm _myForm;
+        public DoneBlock(DoctrinaMainForm form, string qPath, string aPath, DateTime lPrintTime, uint timeRepeated = 0)
         {
             _questionPath = qPath;
             _answerPath = aPath;

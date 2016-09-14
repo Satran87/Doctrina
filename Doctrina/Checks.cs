@@ -8,14 +8,14 @@ namespace Doctrina
 {
     internal static class CheckClass
     {
-        public static bool Cheks(Form1 form1,string selectedFolder)
+        public static bool Cheks(DoctrinaMainForm mainForm,string selectedFolder)
         {
-            if (FolderCheck(form1,selectedFolder))
+            if (FolderCheck(mainForm,selectedFolder))
                 return true;
             //NOTE:Может потом сделать более точную проверку
-            return CheckAlllOther(form1);
+            return CheckAlllOther(mainForm);
         }
-        private static bool CheckAlllOther(Form1 form1)
+        private static bool CheckAlllOther(DoctrinaMainForm form1)
         {
             List<DoneBlock> randBlockCopy = CopyDoneBlocks(form1, form1.DoneBlocks);
             List < List < DoneBlock >> temp=new List<List<DoneBlock>>();//Для совместимости.
@@ -24,7 +24,7 @@ namespace Doctrina
             return false;
         }
 
-        internal static bool GetBlocks_1(Form1 form1, ref List<DoneBlock> randBlockCopy, ref List<List<DoneBlock>> allQuestions, ref List<List<bool>> BannedSymbolsForEachList, List<DoneBlock> constBlocks=null,int maxQuestionOnList=0)
+        internal static bool GetBlocks_1(DoctrinaMainForm form1, ref List<DoneBlock> randBlockCopy, ref List<List<DoneBlock>> allQuestions, ref List<List<bool>> BannedSymbolsForEachList, List<DoneBlock> constBlocks=null,int maxQuestionOnList=0)
         {
             WorkLikeEnum currentWorType = form1.CurrentWorkEnum;
             uint someTimer = 0;
@@ -116,8 +116,8 @@ namespace Doctrina
                             "Ошибка комбинации возможных вариантов \n\rПроверьте вводимые данные и количество доступных вопросов");
                         ErrorLog.AddNewEntry("Вопросов_на_лист=" + form1.MaxQuestionOnListUint + " | Макс_повторов_вопросов= " +
                                              form1.MaxQuestonRepeatUint + " | Всего_листов= " + form1.MaxLists);
-                        if (File.Exists(form1.ChooseFolderPath + @"\" + Form1.FileNameListText))
-                            File.Copy(form1.ChooseFolderPath + @"\" + Form1.FileNameListText,
+                        if (File.Exists(form1.ChooseFolderPath + @"\" + DoctrinaMainForm.FileNameListText))
+                            File.Copy(form1.ChooseFolderPath + @"\" + DoctrinaMainForm.FileNameListText,
                                 "ErrorList" + DateTime.Now.Day + "_" + DateTime.Now.Hour + "_" + DateTime.Now.Minute + "_" +
                                 DateTime.Now.Second + ".csv");
                         return true;
@@ -133,13 +133,13 @@ namespace Doctrina
             return false;
         }
 
-        public static List<DoneBlock> CopyDoneBlocks(Form1 form1, List<DoneBlock> doneBlocks)
+        public static List<DoneBlock> CopyDoneBlocks(DoctrinaMainForm form1, List<DoneBlock> doneBlocks)
         {
             List<DoneBlock> copyedList = doneBlocks.Select(doneBlock => new DoneBlock(form1, doneBlock.QuestionPath, doneBlock.AnswerPath, doneBlock.LastTimePrint, doneBlock.TimeRepeated)).ToList();
             return copyedList;
         }
 
-        public static bool FolderCheck(Form1 form1,string folderPath)
+        public static bool FolderCheck(DoctrinaMainForm form1,string folderPath)
         {
             folderPath = folderPath + "\\";
             var tempAnsDir = Path.GetDirectoryName(folderPath);

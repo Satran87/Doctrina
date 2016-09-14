@@ -12,7 +12,7 @@ using IniHlp;
 
 namespace Doctrina
 {
-    public partial class Form1 : Form
+    public partial class DoctrinaMainForm : Form
     {
         private const string ColunmNameFileName = "Имя файла";
         private const string ColunmNameRepeat = "Повторы";
@@ -109,7 +109,7 @@ namespace Doctrina
         /// </summary>
         internal List<DoneBlock> DoneBlocksOldCopy = new List<DoneBlock>();
 
-        public Form1()
+        public DoctrinaMainForm()
         {
             CheckPassword();
             InitializeComponent();
@@ -394,8 +394,10 @@ namespace Doctrina
             var realFilesCount = Directory.GetFiles(folderPath, "*Р?.docx", SearchOption.TopDirectoryOnly);
             if ((readFile.Count() - 1) == realFilesCount.Count())
                 hasNewFiles = false;
+            int counter = -1;//Счетчик для индекса отмеченных вопросов (констант)
             foreach (var line in readFile.Skip(1))
             {
+                ++counter;
                 var lines = line.Split(';');
                 string answerFullName=string.Empty;
                 bool contain = false;
@@ -419,6 +421,12 @@ namespace Doctrina
                 }
                 var repeatTime = Convert.ToUInt32(lines[1]);
                 var lPrintTime = Convert.ToDateTime(lines[2]);
+                if (CurrentWorkEnum == WorkLikeEnum.GeneratorAndConst)
+                {
+                    if (lines.Count() > 3)
+                        if(Convert.ToBoolean(lines[3]))
+                        CheckedIndex.Add(counter);
+                }
                 DoneBlocks.Add(new DoneBlock(this,questionFullName, answerFullName, lPrintTime, repeatTime));
             }
             return hasNewFiles;
@@ -731,8 +739,8 @@ namespace Doctrina
                         return;
                     }
                 }
-                MyDt.AcceptChanges();
-                ((DataTable)datagridForDataTable.DataSource).AcceptChanges();
+               // MyDt.AcceptChanges();
+                //((DataTable)datagridForDataTable.DataSource).AcceptChanges();
             }
             else
             {
@@ -759,6 +767,9 @@ namespace Doctrina
         {
             if (MyDt.Rows.Count>1)
             {
+                MyDt.AcceptChanges();
+                ((DataTable)datagridForDataTable.DataSource).AcceptChanges();
+
                 folderPath = folderPath + @"\" + FileNameListText;
                 if (!File.Exists(folderPath))
                 {

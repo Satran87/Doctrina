@@ -41,7 +41,6 @@ namespace Doctrina
                 using (var sw = new StreamWriter(fileName, true, Encoding.GetEncoding("windows-1251")))
                 {
                     sw.WriteLine("{0};{1}", tempDocString, tempString);
-                    sw.Close();
                 }
         }
     }
