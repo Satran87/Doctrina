@@ -19,7 +19,7 @@ namespace Doctrina
         private const string ColunmNamelPrintTime = "Время последней печати";
         private const string ColunmNamelCheckFile = "Выбрать файл для печати";
         internal const string FileNameListText = "FileList.csv";
-        private const string ConfigIniFileName = "config.ini";
+        private  string ConfigIniFileName = "config.ini";
         private const string DateThenAllowPrintPickerString = "Data=";
         private const string NumberOfListsString = "NumberOfLists=";
         private const string MaxQuestionOnListString = "MaxQuestionOnList=";
@@ -94,6 +94,7 @@ namespace Doctrina
                 _maxLists = value;
             }
         }
+
         private uint _maxQuestionOnListUint = 5;
         private uint _maxQuestonRepeatUint = 5;
         private uint _maxLists = 5;
@@ -118,12 +119,27 @@ namespace Doctrina
             backgroundWorker2.DoWork += BackgroundWorker2_DoWork;
             cancelButton.Enabled = false;
             InitMyComponents();
+            this.KeyPreview = true;
         }
-
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            var nl = Environment.NewLine;
+            if (e.KeyCode == Keys.F5 && e.Alt && e.Control)
+            {
+                MessageBox.Show(ConfigIniFileName + nl + "Легко = "+ LSTEasyNumber+ nl+"Средне=  "+ LSTMiddleNumber+nl+"Тяжело = " + LSTHardNumber+nl+"Тип работы = "+ CurrentWorkEnum) ;
+                e.Handled = true;
+            }
+        }
         private IniHlpClass IniHlp;
 
         private void InitMyComponents()
         {
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Length > 1)
+            {
+                ConfigIniFileName = args[1];
+            }
             if (!File.Exists(ConfigIniFileName))
             {
                 OnErrorHappen("Файл "+ ConfigIniFileName + " не найден. Запуск невозможен");

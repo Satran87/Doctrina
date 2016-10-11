@@ -28,6 +28,14 @@ namespace IniHlp
 
             _allLinesFromIniFile = File.ReadAllLines(_iniFileName, Encoding.Default);
         }
+
+        /// <summary>
+        /// Текущее полное имя ini файла
+        /// </summary>
+        public string IniFileName
+        {
+            get { return _iniFileName; }
+        }
         /// <summary>
         /// Вернуть число из указанной строки
         /// </summary>

@@ -19,8 +19,17 @@ namespace Config
         public SettingsForm()
         {
             InitializeComponent();
+            this.KeyPreview = true;
         }
-
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            if (e.KeyCode == Keys.F5 && e.Alt && e.Control)
+            {
+                MessageBox.Show(IniHlp.IniFileName);
+                e.Handled = true;
+            }
+        }
         private void Form1_Load(object sender, EventArgs e)
         {
             InitMyComponents();
@@ -32,7 +41,13 @@ namespace Config
         {
             try
             {
-                IniHlp = new IniHlpClass("config.ini");
+                string[] args = Environment.GetCommandLineArgs();
+                if (args.Length<=1)
+                    IniHlp = new IniHlpClass("config.ini");
+                else
+                {
+                    IniHlp = new IniHlpClass(args[1]);
+                }
                 LSTEasyNumber = IniHlp.GetIntFromLine(EasyQuestionString);
                 LSTMiddleNumber = IniHlp.GetIntFromLine(MiddleQuestionString);
                 LSTHardNumber = IniHlp.GetIntFromLine(HardQuestionString);
